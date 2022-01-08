@@ -1,0 +1,26 @@
+{
+	"name": "ribarich/woocommerce-nft-downloads",
+	"minimum-stability": "dev",
+	"authors": [
+		{
+			"name": "Bruno Ribarić",
+			"email": "bruno@ribarich.me"
+		}
+	],
+	"autoload": {
+		"psr-4": {
+			"WNFTD\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"WNFTD\\Test\\": "phpunit/"
+		}
+	},
+	"require-dev": {
+		"wp-phpunit/wp-phpunit": "^5.8",
+		"yoast/phpunit-polyfills": "^1.0",
+		"squizlabs/php_codesniffer": "^3.6",
+		"wp-coding-standards/wpcs": "^2.3"
+	}
+}

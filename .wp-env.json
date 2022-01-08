@@ -1,0 +1,5 @@
+{
+	"core": "WordPress/WordPress",
+	"plugins": [ ".", "https://downloads.wordpress.org/plugin/woocommerce.6.0.0.zip" ],
+	"themes": [ "https://downloads.wordpress.org/theme/jot-shop.1.0.6.zip" ]
+}
