@@ -11,38 +11,41 @@ if ( 'build' === getenv( 'LOCAL_DIR' ) ) {
 	define( 'WP_RUN_CORE_TESTS', true );
 }
 
-// Determine the tests directory (from a WP dev checkout).
-// Try the WP_TESTS_DIR environment variable first.
-$_tests_dir = getenv( 'WP_TESTS_DIR' );
-
-// Next, try the WP_PHPUNIT composer package.
-if ( ! $_tests_dir ) {
-	$_tests_dir = getenv( 'WP_PHPUNIT__DIR' );
-}
-
-// See if we're installed inside an existing WP dev instance.
-if ( ! $_tests_dir ) {
-	$_try_tests_dir = __DIR__ . '/../../../../../tests/phpunit';
-	if ( file_exists( $_try_tests_dir . '/includes/functions.php' ) ) {
-		$_tests_dir = $_try_tests_dir;
-	}
-}
-
-// Fallback.
-if ( ! $_tests_dir ) {
-	$_tests_dir = '/tmp/wordpress-tests-lib';
-}
+$_tests_dir = dirname( __DIR__ ) . '/wp-phpunit';
 
 // Give access to tests_add_filter() function.
 require_once $_tests_dir . '/includes/functions.php';
+
+// Always load PayPal Standard for unit tests.
+tests_add_filter( 'woocommerce_should_load_paypal_standard', '__return_true' );
 
 /**
  * Manually load the plugin being tested.
  */
 function _manually_load_plugin() {
+	$plugins_dir = dirname( dirname( __DIR__ ) );
+	// Load WC
+	define( 'WC_TAX_ROUNDING_MODE', 'auto' );
+	define( 'WC_USE_TRANSACTIONS', false );
+	require $plugins_dir . '/woocommerce/woocommerce.php';
+
+	// Load WNFTD
 	require dirname( __DIR__ ) . '/woocommerce-nft-downloads.php';
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
+
+// Install WC. Copied from how WC does the installation in its own tests.
+function _install_wc() {
+	define( 'WP_UNINSTALL_PLUGIN', true );
+	define( 'WC_REMOVE_ALL_DATA', true );
+	\Automattic\WooCommerce\Admin\Install::create_tables();
+	\Automattic\WooCommerce\Admin\Install::create_events();
+	WC_Install::install();
+	$GLOBALS['wp_roles'] = null; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+	wp_roles();
+	echo esc_html( 'Installing WooCommerce...' . PHP_EOL );
+}
+tests_add_filter( 'setup_theme', '_install_wc' );
 
 /**
  * Adds a wp_die handler for use during tests.

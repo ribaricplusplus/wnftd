@@ -4,9 +4,9 @@ namespace WNFTD;
 
 defined( 'ABSPATH' ) || exit;
 
-class Scripts_Loader {
+class Scripts_Loader implements Interfaces\Initializable {
 
-	public function __construct() {
+	public function init() {
 		// Add scripts
 	}
 

@@ -11,5 +11,6 @@
  */
 
 require 'vendor/autoload.php';
+require 'src/functions.php';
 
-new \WNFTD\WNFTD();
+\WNFTD\instance();
