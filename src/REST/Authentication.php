@@ -49,7 +49,7 @@ class Authentication extends \WP_REST_Controller {
 			);
 		}
 
-		$is_address_valid = \WNFTD\auth()->verify_public_address( $request['public_address'], \WNFTD\get_auth_message( $request['_wpnonce'] ) );
+		$is_address_valid = \WNFTD\auth()->verify_public_address( $request['public_address'], \WNFTD\get_auth_message( $request['_wpnonce'] ), $request['signature'] );
 
 		if ( ! $is_address_valid ) {
 			return new \WP_Error(
@@ -132,7 +132,13 @@ class Authentication extends \WP_REST_Controller {
 			'public_address' => array(
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_key',
+				'required' => true
 			),
+			'signature' => array(
+				'type' => 'string',
+				'sanitize_callback' => 'sanitize_key',
+				'required' => true
+			)
 		);
 	}
 

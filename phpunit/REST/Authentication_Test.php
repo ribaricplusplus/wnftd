@@ -25,18 +25,11 @@ class Authentication_Test extends \WP_Test_REST_TestCase {
 			->getMock();
 		\WNFTD\instance()->auth->method( 'verify_public_address' )
 			->willReturn( true );
-		$nonce    = \wp_create_nonce( 'wnftd_auth' );
-		$request  = $this->get_request(
-			'/wnftd/v1/auth',
-			array(
-				'public_address' => '0x1234',
-				'_wpnonce'       => $nonce,
-			)
-		);
+		$request  = $this->_get_request();
 		$response = \rest_get_server()->dispatch( $request );
 		$this->assertNotWPError( $response );
 		$data = $response->get_data();
-		$this->assertSame( $data['code'], 'added_public_address' );
+		$this->assertSame( 'added_public_address', $data['code'] );
 	}
 
 	public function test_user_already_authenticated() {
@@ -90,6 +83,7 @@ class Authentication_Test extends \WP_Test_REST_TestCase {
 		$nonce    = \wp_create_nonce( 'wnftd_auth' );
 		$defaults = array(
 			'public_address' => '0x1234',
+			'signature' => '0xaaaa',
 			'_wpnonce'       => $nonce,
 		);
 		$params   = \wp_parse_args(

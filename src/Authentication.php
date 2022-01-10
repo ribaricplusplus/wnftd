@@ -4,19 +4,65 @@ namespace WNFTD;
 
 defined( 'ABSPATH' ) || exit;
 
+use Ethereum\Ethereum;
+use Ethereum\DataType\EthD;
+
 class Authentication implements Interfaces\Initializable {
 	public function init() {}
 
-	public function verify_public_address( $public_address, $message ) {
-		// TODO: Implement
+	/**
+	 * @param string $public_address
+	 * @param string $message
+	 * @param string $signature
+	 * @return bool Whether the $signature for $message is by $public address.
+	 */
+	public function verify_public_address( $public_address, $message, $signature ) {
+		try {
+			$signature = new EthD( $signature );
+			$recovered = Ethereum::personalEcRecover( $message, $signature );
+			if ( $recovered === $public_address ) {
+				return true;
+			}
+			return false;
+		} catch( \Exception $e ) {
+			trigger_error(
+				"Exception occurred while recovering public address. This could happen because of a missing PHP extension or a malformed signature / message.",
+				\E_USER_NOTICE
+			);
+			return false;
+		}
 	}
 
 	/**
 	 * @param string $public_address
-	 * @return \WP_User|null
+	 * @return int|null
 	 */
 	public function get_user_by_public_address( $public_address ) {
-		// TODO: Implement
+		$term = $this->get_public_address_term( $public_address );
+
+		if ( empty( $term ) ) {
+			return null;
+		}
+
+		$ids = \get_objects_in_term( $term->term_id, 'wnftd_public_address' );
+
+		if ( empty( $ids ) ) {
+			return null;
+		}
+
+		return $ids[0];
+	}
+
+	/**
+	 * @param string $public_address
+	 * @return \WP_Term|null
+	 */
+	public function get_public_address_term( $public_address ) {
+		$term = \get_term_by( 'name', $public_address, 'wnftd_public_address' );
+		if ( empty( $term ) ) {
+			return null;
+		}
+		return $term;
 	}
 
 	/**
@@ -80,12 +126,50 @@ class Authentication implements Interfaces\Initializable {
 	 */
 	public function create_new_user( $public_address ) {
 		$email   = sprintf( '%s@example.com', \wp_generate_uuid4() );
-		$user_id = \wc_create_new_customer( $email );
-		if ( is_wp_error( $user_id ) ) {
+		if ( $this->public_address_exists( $public_address ) ) {
+			throw new \Exception( 'Cannot create a new user for a public address that already exists.' );
+		}
+
+		$term = \wp_insert_term( $public_address, 'wnftd_public_address' );
+
+		if ( is_wp_error( $term ) ) {
 			throw new \Exception( 'Failed to create user' );
 		}
-		\update_user_option( $user_id, 'wnftd_public_addresses', array( $public_address ) );
+
+		$user_id = \wc_create_new_customer( $email );
+
+		if ( is_wp_error( $user_id ) ) {
+			\wp_delete_term( $term['term_id'] );
+			throw new \Exception( 'Failed to create user.' );
+		}
+
+		$result = \wp_set_object_terms( $user_id,  $term['term_id'], 'wnftd_public_address' );
+
+		if ( is_wp_error( $result ) ) {
+			\wp_delete_user( $user_id );
+			\wp_delete_term( $term['term_id'] );
+			throw new \Exception( 'Failed to create user.' );
+		}
+
 		return $user_id;
 	}
 
+	public function public_address_exists( $public_address ) {
+		return (bool) get_term_by( 'name', $public_address, 'wnftd_public_address' );
+	}
+
+	/**
+	 * @param int $user_id
+	 * @throws \Exception
+	 * @return string[]
+	 */
+	public function get_public_addresses( $user_id ) {
+		$terms = \wp_get_object_terms( $user_id, 'wnftd_public_address' );
+
+		if ( is_wp_error( $terms ) ) {
+			throw new \Exception();
+		}
+
+		return \wp_list_pluck( $terms, 'name' );
+	}
 }
