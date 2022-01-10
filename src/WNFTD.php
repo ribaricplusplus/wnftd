@@ -31,11 +31,15 @@ class WNFTD {
 	}
 
 	public function register_post_types_and_taxonomies() {
-		\register_taxonomy( 'wnftd_public_address', 'user', array(
-			'public' => false,
-			'hierarchical' => false,
-			'show_in_rest' => true,
-		) );
+		\register_taxonomy(
+			'wnftd_public_address',
+			'user',
+			array(
+				'public'       => false,
+				'hierarchical' => false,
+				'show_in_rest' => true,
+			)
+		);
 	}
 
 	public function rest_api_init() {

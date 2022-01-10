@@ -15,7 +15,7 @@
 		"lint:php:fix": "./vendor/bin/phpcbf .",
 		"lint:js": "wp-scripts lint-js",
 		"lint:js:fix": "wp-scripts format '*.js' .wp-env.json package.json composer.json scripts/ js/",
-		"lint:scss:fix": "wp-scripts lint-style --fix",
+		"lint:scss:fix": "wp-scripts lint-style scss/ --fix",
 		"format": "concurrently \"npm run lint:js:fix\" \"npm run lint:php:fix\" \"npm run lint:scss:fix\"",
 		"start": "wp-env start --xdebug"
 	},

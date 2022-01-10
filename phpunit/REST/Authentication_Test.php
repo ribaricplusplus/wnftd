@@ -83,7 +83,7 @@ class Authentication_Test extends \WP_Test_REST_TestCase {
 		$nonce    = \wp_create_nonce( 'wnftd_auth' );
 		$defaults = array(
 			'public_address' => '0x1234',
-			'signature' => '0xaaaa',
+			'signature'      => '0xaaaa',
 			'_wpnonce'       => $nonce,
 		);
 		$params   = \wp_parse_args(

@@ -132,13 +132,13 @@ class Authentication extends \WP_REST_Controller {
 			'public_address' => array(
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_key',
-				'required' => true
+				'required'          => true,
 			),
-			'signature' => array(
-				'type' => 'string',
+			'signature'      => array(
+				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_key',
-				'required' => true
-			)
+				'required'          => true,
+			),
 		);
 	}
 

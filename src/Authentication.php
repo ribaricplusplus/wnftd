@@ -24,9 +24,9 @@ class Authentication implements Interfaces\Initializable {
 				return true;
 			}
 			return false;
-		} catch( \Exception $e ) {
+		} catch ( \Exception $e ) {
 			trigger_error(
-				"Exception occurred while recovering public address. This could happen because of a missing PHP extension or a malformed signature / message.",
+				'Exception occurred while recovering public address. This could happen because of a missing PHP extension or a malformed signature / message.',
 				\E_USER_NOTICE
 			);
 			return false;
@@ -125,7 +125,7 @@ class Authentication implements Interfaces\Initializable {
 	 * @return int User ID.
 	 */
 	public function create_new_user( $public_address ) {
-		$email   = sprintf( '%s@example.com', \wp_generate_uuid4() );
+		$email = sprintf( '%s@example.com', \wp_generate_uuid4() );
 		if ( $this->public_address_exists( $public_address ) ) {
 			throw new \Exception( 'Cannot create a new user for a public address that already exists.' );
 		}
@@ -143,7 +143,7 @@ class Authentication implements Interfaces\Initializable {
 			throw new \Exception( 'Failed to create user.' );
 		}
 
-		$result = \wp_set_object_terms( $user_id,  $term['term_id'], 'wnftd_public_address' );
+		$result = \wp_set_object_terms( $user_id, $term['term_id'], 'wnftd_public_address' );
 
 		if ( is_wp_error( $result ) ) {
 			\wp_delete_user( $user_id );
