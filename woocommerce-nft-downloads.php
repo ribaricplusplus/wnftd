@@ -10,6 +10,8 @@
  * Text Domain: wnftd
  */
 
+define( 'WNFTD_FILE', __FILE__ );
+
 require 'vendor/autoload.php';
 require 'src/functions.php';
 
