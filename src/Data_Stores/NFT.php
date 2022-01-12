@@ -86,12 +86,14 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 		if ( array_intersect(
 			array(
 				'name',
+				'status',
 			),
 			array_keys( $changes )
 		) ) {
 			$id = \wp_update_post(
 				array(
-					'post_title' => empty( $data->get_name() ) ? 'NFT' : $data->get_name(),
+					'post_title'  => empty( $data->get_name() ) ? 'NFT' : $data->get_name(),
+					'post_status' => $data->post_status() ? $data->post_status : 'publish',
 				),
 				true
 			);
