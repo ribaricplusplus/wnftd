@@ -8,10 +8,18 @@ use WNFTD\Interfaces;
 
 class Notices implements Interfaces\Initializable {
 
+	private $initialized;
+
 	public $notices = array();
 
 	public function init() {
+		if ( $this->initialized ) {
+			return;
+		}
+
 		\add_action( 'admin_notices', array( $this, 'output_notices' ) );
+
+		$this->initialized = true;
 	}
 
 	public function add_notice( $name, $message ) {

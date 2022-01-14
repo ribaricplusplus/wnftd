@@ -15,13 +15,14 @@ class WNFTD {
 
 	public $admin;
 
+	public $product_controller;
+
 	/**
 	 * @throws \Exception
 	 */
 	public function __construct() {
-		if ( \is_admin() ) {
-			$this->init_admin();
-		}
+		$this->admin_notices = new Admin\Notices();
+		$this->admin_notices->init();
 
 		$missing_dependencies = $this->get_missing_dependencies();
 
@@ -30,6 +31,12 @@ class WNFTD {
 			$names = implode( ', ', $names );
 			$this->fail_initialization( sprintf( __( 'Missing plugins: %s', 'wnftd' ), $names ), 'fail_missing_plugins' );
 		}
+
+		if ( \is_admin() ) {
+			$this->init_admin();
+		}
+
+		$this->product_controller = new Product_Controller();
 
 		try {
 			$this->ethereum = Factory::create_ethereum();
@@ -49,7 +56,7 @@ class WNFTD {
 
 	public function init_admin() {
 		$this->admin = new Admin(
-			new Admin\Notices(),
+			$this->admin_notices,
 			new Admin\Meta_Boxes(
 				new Admin\Meta_Boxes\NFT(),
 				new Admin\Meta_Boxes\Product()
@@ -67,7 +74,7 @@ class WNFTD {
 		$missing = array();
 
 		if ( ( \defined( '\\WNFTD_TEST' ) && \WNFTD_TEST ) ) {
-			// We assume that all dependencies exist in tests.
+			// We assume that all dependencies exist in phpunit tests (does not apply to e2e).
 			return $missing;
 		}
 
@@ -91,9 +98,7 @@ class WNFTD {
 			\E_USER_NOTICE
 		);
 
-		if ( ! empty( $this->admin ) ) {
-			$this->admin->add_notice( $name, $message );
-		}
+		$this->admin_notices->add_notice( $name, $message );
 
 		throw new Initialization_Exception();
 	}
