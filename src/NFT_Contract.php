@@ -7,14 +7,10 @@ defined( 'ABSPATH' ) || exit;
 abstract class NFT_Contract {
 
 	/**
-	 * @var \Ethereum\SmartContract
+	 * @param string $public_address
+	 * @param NFT    $nft
+	 * @return bool
 	 */
-	public $smart_contract;
-
-	/**
-	 * @param NFT $nft
-	 * @return string Owner public address.
-	 */
-	abstract public function owner_of( $nft );
+	abstract public function is_owner( $public_address, $nft );
 
 }

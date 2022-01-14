@@ -5,6 +5,8 @@
  * Define the path to your wp-tests-config.php using the WP_PHPUNIT__TESTS_CONFIG environment variable.
  */
 
+define( 'WNFTD_TEST', true );
+
 /**
  * Load the real wp-tests-config.php, wherever it may be.
  */

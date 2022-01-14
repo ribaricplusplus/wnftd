@@ -96,20 +96,4 @@ class NFT_Test extends \WP_UnitTestCase {
 		$nft = Factory::create_nft( self::$nft_data[0] );
 		$this->assertValidNFT( $nft );
 	}
-
-	public function test_NFT_owner() {
-		$nft = Factory::create_nft( self::$nft_ids[0] );
-
-		$contract = Factory::create_nft_contract( $nft );
-
-		$contract->smart_contract = $this->getMockBuilder( \stdClass::class )
-			->addMethods( array( 'ownerOf' ) )
-			->getMock();
-
-		$contract->smart_contract->method( 'ownerOf' )
-			->willReturn( self::public_address );
-
-		$this->assertEquals( self::public_address, $contract->owner_of( $nft ) );
-	}
-
 }

@@ -4,6 +4,8 @@ namespace WNFTD;
 
 defined( 'ABSPATH' ) || exit;
 
+use Ethereum\Ethereum;
+
 final class Factory {
 
 	/*
@@ -26,7 +28,7 @@ final class Factory {
 		if ( is_array( $data ) ) {
 			$instance = new NFT();
 			$instance->set_props(
-				$data
+				\WNFTD\filter_keys( $data, $instance->get_data_keys() )
 			);
 		} elseif ( is_numeric( $data ) || is_a( $data, __NAMESPACE__ . '\\NFT' ) ) {
 			$instance = new NFT( $data );
@@ -38,44 +40,49 @@ final class Factory {
 	}
 
 	/**
-	 * @param NFT $data
+	 * @param NFT|array $data Contains 'contract_address' and 'contract_type'.
 	 * @throws \Exception
 	 * @return NFT_Contract
 	 */
 	public static function create_nft_contract( $data ) {
-		$cdata = array();
 		if ( is_a( $data, __NAMESPACE__ . '\\NFT' ) ) {
-			$cdata['contract_address'] = $data->get_contract_address();
-			$cdata['contract_type']    = $data->get_contract_type();
-		} else {
+			$data = array(
+				'contract_address' => $data->get_contract_address(),
+				'contract_type'    => $data->get_contract_type(),
+			);
+		}
+
+		if ( empty( $data['contract_address'] || empty( $data['contract_type'] ) ) ) {
 			throw new \InvalidArgumentException();
 		}
 
-		switch ( $cdata['contract_type'] ) {
+		switch ( $data['contract_type'] ) {
 			case 'erc721':
-				$instance       = new Contracts\ERC721( $cdata['contract_address'] );
-				$abi            = json_decode( file_get_contents( plugin_dir_path( \WNFTD_FILE ) . 'contracts/erc721abi.json' ), true );
-				$smart_contract = new \Ethereum\SmartContract(
+				$instance                 = new Contracts\ERC721( $data['contract_address'] );
+				$abi                      = json_decode( file_get_contents( plugin_dir_path( \WNFTD_FILE ) . 'contracts/erc721abi.json' ) );
+				$instance->smart_contract = new \Ethereum\SmartContract(
 					$abi,
-					$cdata['contract_address'],
+					$data['contract_address'],
 					\WNFTD\instance()->ethereum
 				);
 				break;
 			case 'erc1155':
-				$instance       = new Contracts\ERC1155( $cdata['contract_address'] );
-				$abi            = json_decode( file_get_contents( plugin_dir_path( \WNFTD_FILE ) . 'contracts/erc1155abi.json' ), true );
-				$smart_contract = new \Ethereum\SmartContract(
-					$abi,
-					$cdata['contract_address'],
-					\WNFTD\instance()->ethereum
-				);
+				$instance                   = new Contracts\ERC1155();
+				$instance->contract_address = $data['contract_address'];
 				break;
 			default:
 				throw new \UnexpectedValueException();
 		}
 
-		$instance->smart_contract = $smart_contract;
-
 		return $instance;
+	}
+
+	public static function create_ethereum() {
+		$api_key = \WNFTD\get_api_key();
+
+		if ( ! empty( $api_key ) ) {
+			return new Ethereum( $api_key );
+		}
+		return new Ethereum();
 	}
 }

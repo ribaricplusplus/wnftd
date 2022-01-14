@@ -60,23 +60,23 @@ class NFT extends \WC_Data {
 	*/
 
 	public function get_token_id( $context = 'view' ) {
-		return $this->get_prop( 'token_id' );
+		return $this->get_prop( 'token_id', $context );
 	}
 
 	public function get_contract_address( $context = 'view' ) {
-		return $this->get_prop( 'contract_address' );
+		return $this->get_prop( 'contract_address', $context );
 	}
 
 	public function get_contract_type( $context = 'view' ) {
-		return $this->get_prop( 'contract_type' );
+		return $this->get_prop( 'contract_type', $context );
 	}
 
 	public function get_name( $context = 'view' ) {
-		return $this->get_prop( 'name' );
+		return $this->get_prop( 'name', $context );
 	}
 
 	public function get_status( $context = 'view' ) {
-		return $this->get_prop( 'status' );
+		return $this->get_prop( 'status', $context );
 	}
 
 	/*
@@ -111,9 +111,9 @@ class NFT extends \WC_Data {
 	|--------------------------------------------------------------------------
 	*/
 
-	public function owner_of() {
+	public function is_owner( $public_address ) {
 		$contract = Factory::create_nft_contract( $this );
-		return $contract->owner_of( $this );
+		return $contract->is_owner( $public_address, $this );
 	}
 
 }

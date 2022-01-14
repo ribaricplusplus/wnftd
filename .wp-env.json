@@ -1,9 +1,16 @@
 {
-	"core": "WordPress/WordPress",
+	"core": "WordPress/WordPress#5.9-branch",
 	"plugins": [
 		".",
 		"https://downloads.wordpress.org/plugin/woocommerce.6.0.0.zip"
 	],
 	"themes": [ "https://downloads.wordpress.org/theme/jot-shop.1.0.6.zip" ],
-	"phpVersion": "7.4"
+	"phpVersion": "7.4",
+	"env": {
+		"tests": {
+			"mappings": {
+				"wp-content/plugins/woocommerce-nft-downloads-test-plugins": "./test-plugins"
+			}
+		}
+	}
 }

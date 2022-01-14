@@ -10,4 +10,6 @@ defined( 'ABSPATH' ) || exit;
  */
 interface Initializable {
 
+	public function init();
+
 }

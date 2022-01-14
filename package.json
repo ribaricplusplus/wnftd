@@ -9,6 +9,7 @@
 		"watch:js": "wp-scripts start",
 		"watch:scss": "sass scss:build/css --watch",
 		"test:php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/woocommerce-nft-downloads/phpunit.xml --verbose'",
+		"test:php:api": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/woocommerce-nft-downloads/phpunit.xml --verbose --group remote'",
 		"test:e2e": "wp-scripts test-e2e",
 		"test:js": "wp-scripts test-unit-js",
 		"lint:php": "./vendor/bin/phpcs -s .",

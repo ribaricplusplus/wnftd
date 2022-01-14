@@ -5,7 +5,7 @@
  * Requires at least: 5.8
  * Requires PHP: 7.3
  * Version: 1.0.0
- * Author: Bruno Ribarich
+ * Author: Ribarich
  * Author URI: https://ribarich.me/
  * Text Domain: wnftd
  */
@@ -15,4 +15,12 @@ define( 'WNFTD_FILE', __FILE__ );
 require 'vendor/autoload.php';
 require 'src/functions.php';
 
-\WNFTD\instance();
+
+try {
+	\WNFTD\instance();
+} catch ( \WNFTD\Initialization_Exception $e ) {
+
+	if ( defined( 'WNFTD_TEST' ) && WNFTD_TEST ) {
+		throw $e;
+	}
+}

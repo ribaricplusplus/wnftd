@@ -4,8 +4,6 @@ namespace WNFTD;
 
 defined( 'ABSPATH' ) || exit;
 
-use Ethereum\Ethereum;
-
 /**
  * Main plugin file.
  */
@@ -15,21 +13,74 @@ class WNFTD {
 
 	public $ethereum;
 
+	public $admin;
+
+	/**
+	 * @throws \Exception
+	 */
 	public function __construct() {
-		$rpc_api_key = \get_option( 'wnftd_rpc_api_key' );
-		if ( $rpc_api_key ) {
-			$this->ethereum = new Ethereum( $rpc_api_key );
-		} else {
-			$this->ethereum = new Ethereum();
+		$this->admin = new Admin( new Admin\Notices() );
+		$this->admin->init();
+
+		$missing_dependencies = $this->get_missing_dependencies();
+
+		if ( ! empty( $missing_dependencies ) ) {
+			$names = array_values( $missing_dependencies );
+			$names = implode( ', ', $names );
+			$this->fail_initialization( sprintf( __( 'Missing plugins: %s', 'wnftd' ), $names ), 'fail_missing_plugins' );
 		}
+
+		try {
+			$this->ethereum = Factory::create_ethereum();
+		} catch ( \Exception $e ) {
+			$this->fail_initialization( __( 'Failed to initialize Ethereum RPC', 'wnftd' ), 'fail_ethereum' );
+		}
+
 		$this->auth = new Authentication();
 		$this->auth->init();
 		( new Scripts_Loader() )->init();
 
-		add_filter( 'woocommerce_data_stores', array( $this, 'register_data_stores' ) );
+		\add_filter( 'woocommerce_data_stores', array( $this, 'register_data_stores' ) );
 
 		\add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
 		\add_action( 'init', array( $this, 'register_post_types_and_taxonomies' ) );
+	}
+
+	public function get_missing_dependencies() {
+		if ( ! \function_exists( '\\is_plugin_active' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$missing = array();
+
+		if ( ( \defined( '\\WNFTD_TEST' ) && \WNFTD_TEST ) ) {
+			// We assume that all dependencies exist in tests.
+			return $missing;
+		}
+
+		if ( ! \is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+			$missing['woocommerce'] = 'WooCommerce';
+		}
+
+		return $missing;
+	}
+
+	/**
+	 * @throws Initialization_Exception
+	 */
+	public function fail_initialization( $message = '', $name = 'initialization_failed' ) {
+		if ( empty( $message ) ) {
+			$message = __( 'Failed to initialize WooCommerce NFT Downloads.', 'wnftd' );
+		}
+
+		\trigger_error(
+			$message,
+			\E_USER_NOTICE
+		);
+
+		$this->admin->add_notice( $name, $message );
+
+		throw new Initialization_Exception();
 	}
 
 	public function register_data_stores( $stores ) {
@@ -89,6 +140,7 @@ class WNFTD {
 				'has_archive'         => false,
 				'show_in_rest'        => true,
 				'show_in_nav_menus'   => false,
+				'supports' => array( 'title', 'custom-fields' )
 			)
 		);
 	}

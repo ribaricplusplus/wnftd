@@ -5,6 +5,7 @@ const path = require( 'path' );
 
 module.exports = {
 	...baseConfig,
+	testMatch: [ '**/specs/**/*.test.[jt]s?(x)' ],
 	setupFilesAfterEnv: [
 		...baseConfig.setupFilesAfterEnv,
 		path.join( __dirname, 'scripts/activate-plugin.js' ),
