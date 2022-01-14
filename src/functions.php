@@ -33,7 +33,7 @@ function auth() {
  * @param string $path Example 'notices/error'.
  * @param array  $args Arguments to make available to view.
  */
-function view( $path, $args ) {
+function view( $path, $args = array() ) {
 	require \plugin_dir_path( \WNFTD_FILE ) . 'views/' . $path . '.php';
 }
 
@@ -77,4 +77,8 @@ function get_api_key( $force = false ) {
 
 	$api_key = null;
 	return $api_key;
+}
+
+function clean_unslash( $var ) {
+	return \wc_clean( \wp_unslash( $var ) );
 }

@@ -1,0 +1,47 @@
+<?php
+defined( 'ABSPATH' ) || exit;
+
+global $post;
+
+$nft = empty( $post ) || empty( $post->ID ) ? \WNFTD\Factory::create_nft() : \WNFTD\Factory::create_nft( $post->ID );
+
+\wp_nonce_field( 'wnftd_save_nonce', 'wnftd_meta_nonce' );
+
+?>
+<div class="panel woocommerce_options_panel">
+	<?php
+		\woocommerce_wp_text_input(
+			array(
+				'id'    => 'token_id',
+				'value' => $nft->get_token_id(),
+				'label' => __( 'Token ID', 'wnftd' ),
+				'type'  => 'text',
+			)
+		);
+		?>
+
+	<?php
+		\woocommerce_wp_text_input(
+			array(
+				'id'    => 'contract_address',
+				'value' => $nft->get_contract_address(),
+				'label' => __( 'Contract address', 'wnftd' ),
+				'type'  => 'text',
+			)
+		);
+		?>
+
+	<?php
+		\woocommerce_wp_select(
+			array(
+				'id'      => 'contract_type',
+				'value'   => $nft->get_contract_type(),
+				'label'   => __( 'Contract type', 'wnftd' ),
+				'options' => array(
+					'erc721'  => 'ERC721',
+					'erc1155' => 'ERC1155',
+				),
+			)
+		);
+		?>
+</div>

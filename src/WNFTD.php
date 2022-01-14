@@ -19,8 +19,9 @@ class WNFTD {
 	 * @throws \Exception
 	 */
 	public function __construct() {
-		$this->admin = new Admin( new Admin\Notices() );
-		$this->admin->init();
+		if ( \is_admin() ) {
+			$this->init_admin();
+		}
 
 		$missing_dependencies = $this->get_missing_dependencies();
 
@@ -44,6 +45,18 @@ class WNFTD {
 
 		\add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
 		\add_action( 'init', array( $this, 'register_post_types_and_taxonomies' ) );
+	}
+
+	public function init_admin() {
+		$this->admin = new Admin(
+			new Admin\Notices(),
+			new Admin\Meta_Boxes(
+				new Admin\Meta_Boxes\NFT(),
+				new Admin\Meta_Boxes\Product()
+			),
+			new Admin\Scripts(),
+		);
+		$this->admin->init();
 	}
 
 	public function get_missing_dependencies() {
@@ -78,7 +91,9 @@ class WNFTD {
 			\E_USER_NOTICE
 		);
 
-		$this->admin->add_notice( $name, $message );
+		if ( ! empty( $this->admin ) ) {
+			$this->admin->add_notice( $name, $message );
+		}
 
 		throw new Initialization_Exception();
 	}
@@ -140,7 +155,7 @@ class WNFTD {
 				'has_archive'         => false,
 				'show_in_rest'        => true,
 				'show_in_nav_menus'   => false,
-				'supports' => array( 'title', 'custom-fields' )
+				'supports'            => array( 'title', 'thumbnail' ),
 			)
 		);
 	}

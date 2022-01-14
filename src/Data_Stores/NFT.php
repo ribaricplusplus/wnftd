@@ -27,7 +27,8 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 				'post_status' => $data->get_status() ? $data->get_status() : 'publish',
 				'post_author' => \get_current_user_id(),
 			),
-			true
+			true,
+			false
 		);
 
 		if ( \is_wp_error( $id ) ) {
@@ -95,7 +96,8 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 					'post_title'  => empty( $data->get_name() ) ? 'NFT' : $data->get_name(),
 					'post_status' => $data->post_status() ? $data->post_status : 'publish',
 				),
-				true
+				true,
+				false
 			);
 
 			if ( \is_wp_error( $id ) ) {
