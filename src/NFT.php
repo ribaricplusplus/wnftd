@@ -20,6 +20,7 @@ class NFT extends \WC_Data {
 		'contract_type'    => '',
 		'name'             => '',
 		'status'           => 'publish',
+		'fake_owner' => ''
 	);
 
 	/*
@@ -79,6 +80,10 @@ class NFT extends \WC_Data {
 		return $this->get_prop( 'status', $context );
 	}
 
+	public function get_fake_owner( $context = 'view' ) {
+		return $this->get_prop( 'fake_owner', $context );
+	}
+
 	/*
 	|--------------------------------------------------------------------------
 	| Setters
@@ -103,6 +108,10 @@ class NFT extends \WC_Data {
 
 	public function set_status( $data ) {
 		return $this->set_prop( 'status', $data );
+	}
+
+	public function set_fake_owner( $data ) {
+		return $this->set_prop( 'fake_owner', $data );
 	}
 
 	/*

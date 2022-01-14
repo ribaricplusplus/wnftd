@@ -82,3 +82,7 @@ function get_api_key( $force = false ) {
 function clean_unslash( $var ) {
 	return \wc_clean( \wp_unslash( $var ) );
 }
+
+function product_controller() {
+	return instance()->product_controller;
+}

@@ -153,6 +153,19 @@ class Authentication implements Interfaces\Initializable {
 		return $user_id;
 	}
 
+	public function delete_user( $user_id ) {
+		$terms = \wp_get_object_terms( $user_id, 'wnftd_public_address' );
+		foreach( $terms as $term ) {
+			$val = \wp_delete_term( $term, 'wnftd_public_address' );
+
+			if ( $val === false ) {
+				throw new \Exception('Failed to delete user.');
+			}
+		}
+
+		\wp_delete_user( $user_id );
+	}
+
 	public function public_address_exists( $public_address ) {
 		return (bool) get_term_by( 'name', $public_address, 'wnftd_public_address' );
 	}

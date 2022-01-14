@@ -10,6 +10,7 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 		'token_id',
 		'contract_address',
 		'contract_type',
+		'fake_owner'
 	);
 
 	protected $meta_type = 'post';
@@ -56,6 +57,7 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 		$token_id         = \get_post_meta( $post->ID, 'token_id', true );
 		$contract_address = \get_post_meta( $post->ID, 'contract_address', true );
 		$contract_type    = \get_post_meta( $post->ID, 'contract_type', true );
+		$fake_owner    = \get_post_meta( $post->ID, 'fake_owner', true );
 
 		$data->set_props(
 			array(
@@ -64,6 +66,7 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 				'contract_address' => empty( $contract_address ) ? '' : $contract_address,
 				'contract_type'    => empty( $contract_type ) ? '' : $contract_type,
 				'status'           => $post->post_status,
+				'fake_owner' => $fake_owner
 			)
 		);
 
@@ -121,7 +124,7 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 			return;
 		}
 
-		$deleted = \wp_delete_post( $data->get_id() );
+		$deleted = \wp_delete_post( $data->get_id(), true );
 
 		if ( empty( $deleted ) ) {
 			throw new \Exception( 'Failed to delete NFT.' );
@@ -135,6 +138,7 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 			'token_id'         => 'token_id',
 			'contract_address' => 'contract_address',
 			'contract_type'    => 'contract_type',
+			'fake_owner' => 'fake_owner'
 		);
 
 		$props_to_update = $force ? $meta_key_to_props : $this->get_props_to_update( $data, $meta_key_to_props );

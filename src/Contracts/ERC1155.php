@@ -15,6 +15,9 @@ class ERC1155 extends \WNFTD\NFT_Contract {
 	 * @return bool
 	 */
 	public function is_owner( $public_address, $nft ) {
+		if ( $this->should_use_fake_owner( $nft ) ) {
+			return parent::is_owner( $public_address, $nft );
+		}
 		try {
 			$balance = $this->get_balance( $public_address, $nft );
 			return $balance > 0;

@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || exit;
 
 use Ethereum\Ethereum;
 
-final class Factory {
+class Factory {
 
 	/*
 	|--------------------------------------------------------------------------

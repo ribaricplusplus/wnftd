@@ -36,7 +36,10 @@ class WNFTD {
 			$this->init_admin();
 		}
 
-		$this->product_controller = new Product_Controller();
+		$this->auth = new Authentication();
+		$this->auth->init();
+
+		$this->product_controller = new Product_Controller( $this->auth );
 
 		try {
 			$this->ethereum = Factory::create_ethereum();
@@ -44,8 +47,6 @@ class WNFTD {
 			$this->fail_initialization( __( 'Failed to initialize Ethereum RPC', 'wnftd' ), 'fail_ethereum' );
 		}
 
-		$this->auth = new Authentication();
-		$this->auth->init();
 		( new Scripts_Loader() )->init();
 
 		\add_filter( 'woocommerce_data_stores', array( $this, 'register_data_stores' ) );
@@ -174,6 +175,9 @@ class WNFTD {
 			$instance = new $class();
 			$instance->register_routes();
 		}
+
+		$products = new REST\Products( $this->product_controller );
+		$products->register_routes();
 	}
 
 }

@@ -19,6 +19,10 @@ class ERC721 extends \WNFTD\NFT_Contract {
 	 * @return bool
 	 */
 	public function is_owner( $public_address, $nft ) {
+		if ( $this->should_use_fake_owner( $nft ) ) {
+			return parent::is_owner( $public_address, $nft );
+		}
+
 		try {
 			$owner = $this->get_owner( $nft );
 
