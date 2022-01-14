@@ -115,8 +115,7 @@ class Authentication implements Interfaces\Initializable {
 		if ( is_object( $user ) ) {
 			$user = $user->ID;
 		}
-		wp_set_auth_cookie( $user->ID, false );
-		wp_set_current_user( $user->ID );
+		\wc_set_customer_auth_cookie( $user->ID );
 	}
 
 	/**
