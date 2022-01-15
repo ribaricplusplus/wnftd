@@ -4,20 +4,38 @@ namespace WNFTD;
 
 defined( 'ABSPATH' ) || exit;
 
-class Product_Controller {
+use WNFTD\Interfaces\Initializable;
+
+class Product_Controller implements Initializable {
 
 	public $auth;
 
 	public $factory;
 
-	  public function __construct( $auth, $factory = false ) {
-	  	$this->auth = $auth;
+	public function init() {
+		\add_filter( 'woocommerce_is_purchasable', array( $this, 'woocommerce_is_purchasable' ), 10, 2 );
+	}
+
+	public function woocommerce_is_purchasable( $purchasable, $product ) {
+		if ( ! $purchasable ) {
+			return $purchasable;
+		}
+
+		if ( $this->is_nft_restricted( $product ) ) {
+			return false;
+		}
+
+		return $purchasable;
+	}
+
+	public function __construct( $auth, $factory = false ) {
+		$this->auth = $auth;
 		if ( empty( $factory ) ) {
 			$this->factory = new Factory(); // Not ideal
 		} else {
 			$this->factory = $factory;
 		}
-	  }
+	}
 
 	/**
 	 * @param \WC_Product $product
@@ -26,14 +44,14 @@ class Product_Controller {
 	public function give_product_to_user( $product, $user ) {
 		$order = \wc_create_order(
 			array(
-				'customer_id' => $user
+				'customer_id' => $user,
 			)
 		);
 		$order->add_product( $product );
-		$id = $order->save();
+		$id    = $order->save();
 		$order = \wc_create_order(
 			array(
-				'order_id' => $id
+				'order_id' => $id,
 			)
 		);
 		$order->set_status( 'completed' );
@@ -68,15 +86,14 @@ class Product_Controller {
 			return false;
 		}
 
-		$required_nfts = $product->get_meta(  'wnftd_product_nft', false  );
-		$required_nfts = \wp_list_pluck( $required_nfts, 'value' );
+		$required_nfts = $this->get_required_nfts_ids( $product );
 
 		// Is there any public address that owns all required NFTs?
-		foreach( $public_addresses as $public_address ) {
+		foreach ( $public_addresses as $public_address ) {
 
 			$has_access = true;
 
-			foreach( $required_nfts as $nft_id ) {
+			foreach ( $required_nfts as $nft_id ) {
 				$nft = $this->factory->create_nft( $nft_id );
 
 				if ( ! $nft->is_owner( $public_address ) ) {
@@ -94,7 +111,16 @@ class Product_Controller {
 		return false;
 	}
 
+	public function get_required_nfts_ids( $product ) {
+		$required_nfts = $product->get_meta( 'wnftd_product_nft', false );
+		$required_nfts = \wp_list_pluck( $required_nfts, 'value' );
+		return $required_nfts;
+	}
+
 	public function is_nft_restricted( $product ) {
+		if ( is_numeric( $product ) ) {
+			$product = new \WC_Product( $product );
+		}
 
 		$required_nfts = $product->get_meta( 'wnftd_product_nft', false );
 

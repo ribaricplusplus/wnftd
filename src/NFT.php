@@ -20,7 +20,9 @@ class NFT extends \WC_Data {
 		'contract_type'    => '',
 		'name'             => '',
 		'status'           => 'publish',
-		'fake_owner' => ''
+		'fake_owner'       => '',
+		'image_id'         => 0,
+		'buy_url'          => '',
 	);
 
 	/*
@@ -84,6 +86,14 @@ class NFT extends \WC_Data {
 		return $this->get_prop( 'fake_owner', $context );
 	}
 
+	public function get_image_id( $context = 'view' ) {
+		return $this->get_prop( 'image_id', $context );
+	}
+
+	public function get_buy_url( $context = 'view' ) {
+		return $this->get_prop( 'buy_url', $context );
+	}
+
 	/*
 	|--------------------------------------------------------------------------
 	| Setters
@@ -112,6 +122,14 @@ class NFT extends \WC_Data {
 
 	public function set_fake_owner( $data ) {
 		return $this->set_prop( 'fake_owner', $data );
+	}
+
+	public function set_image_id( $data ) {
+		return $this->set_prop( 'image_id', $data );
+	}
+
+	public function set_buy_url( $data ) {
+		return $this->set_prop( 'buy_url', $data );
 	}
 
 	/*

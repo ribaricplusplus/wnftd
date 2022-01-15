@@ -33,5 +33,16 @@
 		"concurrently": "6.4.0",
 		"prettier": "npm:wp-prettier@2.2.1-beta-1",
 		"sass": "1.45.0"
+	},
+	"dependencies": {
+		"@emotion/react": "11.7.1",
+		"@emotion/styled": "11.6.0",
+		"@mui/material": "5.2.8",
+		"@wordpress/api-fetch": "5.2.6",
+		"@wordpress/data-controls": "2.2.8",
+		"@wordpress/dom-ready": "3.2.3",
+		"@wordpress/element": "4.0.4",
+		"@wordpress/i18n": "4.2.4",
+		"lodash": "4.17.21"
 	}
 }

@@ -33,15 +33,15 @@ class Authentication extends \WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function authenticate( $request ) {
-		if ( empty( $request['_wpnonce'] ) ) {
+		if ( empty( $request['wnftd_auth_nonce'] ) ) {
 			return new \WP_Error(
 				'wnftd_rest_error',
-				'_wpnonce is required',
+				'wnftd_auth_nonce is required',
 				array( 'status' => 400 )
 			);
 		}
 
-		if ( ! wp_verify_nonce( $request['_wpnonce'], 'wnftd_auth' ) ) {
+		if ( ! wp_verify_nonce( $request['wnftd_auth_nonce'], 'wnftd_auth' ) ) {
 			return new \WP_Error(
 				'wnftd_rest_error',
 				'Bad nonce.',
@@ -49,7 +49,7 @@ class Authentication extends \WP_REST_Controller {
 			);
 		}
 
-		$is_address_valid = \WNFTD\auth()->verify_public_address( $request['public_address'], \WNFTD\get_auth_message( $request['_wpnonce'] ), $request['signature'] );
+		$is_address_valid = \WNFTD\auth()->verify_public_address( $request['public_address'], \WNFTD\get_auth_message( $request['wnftd_auth_nonce'] ), $request['signature'] );
 
 		if ( ! $is_address_valid ) {
 			return new \WP_Error(

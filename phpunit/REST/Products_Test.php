@@ -20,7 +20,7 @@ class Products_Test extends \WP_Test_REST_TestCase {
 	public function test_valid_nft_owner_gets_product_access() {
 		// Owner of self::$owner_address.
 		\wp_set_current_user( $this->sut_user );
-		$request = $this->_get_request();
+		$request  = $this->_get_request();
 		$response = \rest_get_server()->dispatch( $request );
 		$this->assertNotWPError( $response );
 		$this->assertNotEquals( $response->status, 401 );
@@ -35,11 +35,11 @@ class Products_Test extends \WP_Test_REST_TestCase {
 	}
 
 	public function test_access_granted_when_product_already_owned() {
-		$user_id = $this->sut_user;
+		$user_id    = $this->sut_user;
 		$product_id = $this->sut_product;
 		\wp_set_current_user( $user_id );
 		\WNFTD\product_controller()->give_product_to_user( new \WC_Product( $product_id ), $user_id );
-		$request = $this->_get_request();
+		$request  = $this->_get_request();
 		$response = \rest_get_server()->dispatch( $request );
 		$this->assertNotWPError( $response );
 		$data = $response->get_data();
@@ -49,20 +49,20 @@ class Products_Test extends \WP_Test_REST_TestCase {
 	public function test_invalid_request_gets_permission_denied() {
 		$user_id = \WNFTD\auth()->create_new_user( self::$random_address ); // Does not own the needed NFT
 		\wp_set_current_user( $user_id );
-		$request = $this->_get_request();
+		$request  = $this->_get_request();
 		$response = \rest_get_server()->dispatch( $request );
 		$this->assertEquals( $response->status, 401 );
 	}
 
 	protected function _get_request( $params = array() ) {
-		$nonce    = \wp_create_nonce( 'wnftd_product_download' );
+		$nonce = \wp_create_nonce( 'wnftd_product_download' );
 
 		$defaults = array(
-			'id' => $this->sut_product,
-			'_wpnonce' => $nonce
+			'id'                  => $this->sut_product,
+			'wnftd_product_nonce' => $nonce,
 		);
 
-		$params   = \wp_parse_args(
+		$params = \wp_parse_args(
 			$params,
 			$defaults,
 		);

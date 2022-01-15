@@ -41,4 +41,11 @@ class Authentication_Test extends \WP_UnitTestCase {
 		$this->assertEquals( $user_id, $found_user_id );
 	}
 
+	public function test_assign_public_address_to_user() {
+		$sut  = new \WNFTD\Authentication();
+		$user = $this->factory->user->create();
+		$sut->assign_public_address_to_user( '0x1234', $user );
+		$this->assertNotEmpty( \wp_get_object_terms( $user, 'wnftd_public_address' ) );
+	}
+
 }

@@ -10,7 +10,9 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 		'token_id',
 		'contract_address',
 		'contract_type',
-		'fake_owner'
+		'fake_owner',
+		'_thumbnail_id',
+		'buy_url',
 	);
 
 	protected $meta_type = 'post';
@@ -57,7 +59,8 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 		$token_id         = \get_post_meta( $post->ID, 'token_id', true );
 		$contract_address = \get_post_meta( $post->ID, 'contract_address', true );
 		$contract_type    = \get_post_meta( $post->ID, 'contract_type', true );
-		$fake_owner    = \get_post_meta( $post->ID, 'fake_owner', true );
+		$fake_owner       = \get_post_meta( $post->ID, 'fake_owner', true );
+		$buy_url          = \get_post_meta( $post->ID, 'buy_url', true );
 
 		$data->set_props(
 			array(
@@ -66,7 +69,9 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 				'contract_address' => empty( $contract_address ) ? '' : $contract_address,
 				'contract_type'    => empty( $contract_type ) ? '' : $contract_type,
 				'status'           => $post->post_status,
-				'fake_owner' => $fake_owner
+				'fake_owner'       => $fake_owner,
+				'image_id'         => \get_post_thumbnail_id( $post->ID ),
+				'buy_url'          => $buy_url,
 			)
 		);
 
@@ -91,13 +96,15 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 			array(
 				'name',
 				'status',
+				'image_id',
 			),
 			array_keys( $changes )
 		) ) {
 			$id = \wp_update_post(
 				array(
+					'ID'          => $data->get_id(),
 					'post_title'  => empty( $data->get_name() ) ? 'NFT' : $data->get_name(),
-					'post_status' => $data->post_status() ? $data->post_status : 'publish',
+					'post_status' => $data->get_status() ? $data->post_status : 'publish',
 				),
 				true,
 				false
@@ -106,6 +113,8 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 			if ( \is_wp_error( $id ) ) {
 				throw new \Exception( 'Failed updating NFT.' );
 			}
+
+			\set_post_thumbnail( $data->get_id(), $data->get_image_id() );
 		}
 
 		$this->update_post_meta( $data );
@@ -138,7 +147,8 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 			'token_id'         => 'token_id',
 			'contract_address' => 'contract_address',
 			'contract_type'    => 'contract_type',
-			'fake_owner' => 'fake_owner'
+			'fake_owner'       => 'fake_owner',
+			'buy_url'          => 'buy_url',
 		);
 
 		$props_to_update = $force ? $meta_key_to_props : $this->get_props_to_update( $data, $meta_key_to_props );

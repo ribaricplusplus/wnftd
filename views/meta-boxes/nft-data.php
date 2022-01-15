@@ -48,13 +48,25 @@ $nft = empty( $post ) || empty( $post->ID ) ? \WNFTD\Factory::create_nft() : \WN
 	<?php
 		\woocommerce_wp_text_input(
 			array(
-				'id'    => 'fake_owner',
-				'value' => $nft->get_fake_owner(),
-				'label' => __( 'Fake owner', 'wnftd' ),
-				'desc_tip' => true,
-				'description' => __( 'This field is useful for testing. The public address set here will be treated as the NFT owner. Remember to delete this field later.', 'wnftd' ),
+				'id'    => 'buy_url',
+				'value' => $nft->get_buy_url(),
+				'label' => __( 'URL', 'wnftd' ),
 				'type'  => 'text',
 			)
 		);
 		?>
+
+	<?php
+		\woocommerce_wp_text_input(
+			array(
+				'id'          => 'fake_owner',
+				'value'       => $nft->get_fake_owner(),
+				'label'       => __( 'Fake owner', 'wnftd' ),
+				'desc_tip'    => true,
+				'description' => __( 'This field is useful for testing. The public address set here will be treated as the NFT owner. Remember to delete this field later.', 'wnftd' ),
+				'type'        => 'text',
+			)
+		);
+		?>
+
 </div>

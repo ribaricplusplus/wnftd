@@ -37,7 +37,7 @@ class ERC721 extends \WNFTD\NFT_Contract {
 			return false;
 		}
 
-		return $owner === $public_address;
+		return \WNFTD\public_addresses_equal( $owner, $public_address );
 	}
 
 	/**

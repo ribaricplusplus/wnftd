@@ -4,8 +4,7 @@ namespace WNFTD;
 
 defined( 'ABSPATH' ) || exit;
 
-use Ethereum\Ethereum;
-use Ethereum\DataType\EthD;
+use Ethereum\EcRecover;
 
 class Authentication implements Interfaces\Initializable {
 	public function init() {}
@@ -18,8 +17,7 @@ class Authentication implements Interfaces\Initializable {
 	 */
 	public function verify_public_address( $public_address, $message, $signature ) {
 		try {
-			$signature = new EthD( $signature );
-			$recovered = Ethereum::personalEcRecover( $message, $signature );
+			$recovered = EcRecover::personalEcRecover( $message, $signature );
 			if ( $recovered === $public_address ) {
 				return true;
 			}
@@ -81,13 +79,12 @@ class Authentication implements Interfaces\Initializable {
 	 * @param int    $user_id
 	 */
 	public function assign_public_address_to_user( $public_address, $user_id ) {
-		$public_addresses = get_user_option( 'wnftd_public_addresses', $user_id );
-		if ( empty( $public_addresses ) ) {
-			$public_addresses = array();
+
+		if ( ! \term_exists( $public_address ) ) {
+			\wp_insert_term( $public_address, 'wnftd_public_address' );
 		}
-		$public_addresses[] = $public_address;
-		$public_addresses   = array_values( array_unique( $public_addresses ) );
-		update_user_option( $user_id, 'wnftd_public_addresses', $public_addresses );
+
+		\wp_add_object_terms( $user_id, $public_address, 'wnftd_public_address' );
 	}
 
 	/**
@@ -95,17 +92,7 @@ class Authentication implements Interfaces\Initializable {
 	 * @param int    $user_id
 	 */
 	public function unassign_public_address_from_user( $public_address, $user_id ) {
-		$public_addresses = get_user_option( 'wnftd_public_addresses', $user_id );
-		$public_addresses = array_filter(
-			$public_addresses,
-			function( $address ) use ( $public_address ) {
-				if ( $address !== $public_address ) {
-					return true;
-				}
-				return false;
-			}
-		);
-		update_user_option( $user_id, 'wnftd_public_addresses', $public_addresses );
+		\wp_remove_object_terms( $user_id, $public_address, 'wnftd_public_address' );
 	}
 
 	/**
@@ -115,7 +102,7 @@ class Authentication implements Interfaces\Initializable {
 		if ( is_object( $user ) ) {
 			$user = $user->ID;
 		}
-		\wc_set_customer_auth_cookie( $user->ID );
+		\wc_set_customer_auth_cookie( $user );
 	}
 
 	/**
@@ -155,11 +142,11 @@ class Authentication implements Interfaces\Initializable {
 
 	public function delete_user( $user_id ) {
 		$terms = \wp_get_object_terms( $user_id, 'wnftd_public_address' );
-		foreach( $terms as $term ) {
+		foreach ( $terms as $term ) {
 			$val = \wp_delete_term( $term, 'wnftd_public_address' );
 
 			if ( $val === false ) {
-				throw new \Exception('Failed to delete user.');
+				throw new \Exception( 'Failed to delete user.' );
 			}
 		}
 
@@ -176,6 +163,10 @@ class Authentication implements Interfaces\Initializable {
 	 * @return string[]
 	 */
 	public function get_public_addresses( $user_id ) {
+		if ( empty( $user_id ) ) {
+			return array();
+		}
+
 		$terms = \wp_get_object_terms( $user_id, 'wnftd_public_address' );
 
 		if ( is_wp_error( $terms ) ) {

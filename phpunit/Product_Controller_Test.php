@@ -19,10 +19,10 @@ class Product_Controller_Test extends \WP_UnitTestCase {
 	}
 
 	public function test_give_product_to_user() {
-		$sut = new Product_Controller( \WNFTD\auth() );
+		$sut     = new Product_Controller( \WNFTD\auth() );
 		$product = new \WC_Product( $this->sut_product );
-		$user = $this->sut_user;
-		$sut->give_product_to_user($product, $user );
+		$user    = $this->sut_user;
+		$sut->give_product_to_user( $product, $user );
 
 		$this->assertTrue( \wc_customer_bought_product( '', $user, $product->get_id() ) );
 	}
@@ -44,18 +44,18 @@ class Product_Controller_Test extends \WP_UnitTestCase {
 		$sut->grant_access_by_nft( $user_id, $product );
 
 		$available_downloads = \wc_get_customer_available_downloads( $user_id );
-		$available_downloads = \wp_list_pluck( $available_downloads , 'product_id' );
-		$this->assertContains( $product->get_id(),  $available_downloads );
+		$available_downloads = \wp_list_pluck( $available_downloads, 'product_id' );
+		$this->assertContains( $product->get_id(), $available_downloads );
 	}
 
 	public function test_grant_access_rejects_for_user_who_does_not_own_nft() {
-		$user_id = \WNFTD\auth()->create_new_user( self::$random_address ); // Does not own the needed NFT
+		$user_id      = \WNFTD\auth()->create_new_user( self::$random_address ); // Does not own the needed NFT
 		$mock_factory = $this->get_mock_factory( self::$owner_address );
-		$sut = new Product_Controller(
+		$sut          = new Product_Controller(
 			\WNFTD\auth(),
 			$mock_factory
 		);
-		$product = new \WC_Product( $this->sut_product );
+		$product      = new \WC_Product( $this->sut_product );
 		$sut->grant_access_by_nft( $user_id, $product );
 		$this->assertNotContains( $product->get_id(), \wp_list_pluck( \wc_get_customer_available_downloads( $user_id ), 'product_id' ) );
 	}
@@ -63,7 +63,7 @@ class Product_Controller_Test extends \WP_UnitTestCase {
 	public function get_mock_factory( $owner_address ) {
 		return new class( $owner_address ) {
 			public function __construct( $owner_address ) {
-				$this->owner_address  = $owner_address;
+				$this->owner_address = $owner_address;
 			}
 
 			public function create_nft( $data = '' ) {

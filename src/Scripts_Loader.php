@@ -6,8 +6,29 @@ defined( 'ABSPATH' ) || exit;
 
 class Scripts_Loader implements Interfaces\Initializable {
 
+	public $product_controller;
+
+	public $auth;
+
 	public function init() {
-		// Add scripts
+		\add_action( 'init', array( $this, 'register_scripts' ) );
+	}
+
+	public function __construct( $product_controller, $auth ) {
+		$this->product_controller = $product_controller;
+		$this->auth               = $auth;
+	}
+
+	public function register_scripts() {
+		$data = $this->get_script_data( 'verify-nft-ownership' );
+
+		\wp_register_script(
+			'wnftd-verify-nft-ownership',
+			\plugins_url( 'build/verify-nft-ownership.js', \WNFTD_FILE ),
+			$data['dependencies'],
+			$data['version'],
+			true
+		);
 	}
 
 	/**
@@ -17,10 +38,68 @@ class Scripts_Loader implements Interfaces\Initializable {
 	 * @return array Script data (version, dependencies)
 	 */
 	protected function get_script_data( $script_name ) {
-		$assets_path = plugin_dir_path( RIBARICH_DDLB_FILE ) . 'build/' . $script_name . '.asset.php';
+		$assets_path = plugin_dir_path( \WNFTD_FILE ) . 'build/' . $script_name . '.asset.php';
+
 		if ( file_exists( $assets_path ) ) {
 			$data = require $assets_path;
 			return $data;
+		}
+
+		return array(
+			'dependencies' => array(),
+			'version'      => '',
+		);
+	}
+
+	public function add_inline_data( $script ) {
+		global $product;
+
+		switch ( $script ) {
+			case 'wnftd-verify-nft-ownership':
+				if ( empty( $product ) ) {
+					break;
+				}
+				$auth_nonce = \wp_create_nonce( 'wnftd_auth' );
+
+				$required_nfts = $this->product_controller->get_required_nfts_ids( $product );
+				$required_nfts = array_map( array( '\\WNFTD\\Factory', 'create_nft' ), $required_nfts );
+				$required_nfts = array_values(
+					array_map(
+						function( $nft ) {
+							return array(
+								'name'   => $nft->get_name(),
+								'image'  => $nft->get_image_id() ? \wp_get_attachment_image_url( $nft->get_image_id() ) : '',
+								'buyUrl' => $nft->get_buy_url(),
+							);
+						},
+						$required_nfts
+					)
+				);
+
+				$data = array(
+					'userLoggedIn'             => \is_user_logged_in(),
+					'nonces'                   => array(
+						'auth'     => $auth_nonce,
+						'download' => \wp_create_nonce( 'wnftd_product_download' ),
+					),
+					'userOwnedPublicAddresses' => $this->auth->get_public_addresses( \get_current_user_id() ),
+					'messageForSigning'        => \WNFTD\get_auth_message( $auth_nonce ),
+					'productId'                => $product->get_id(),
+					'requiredNfts'             => $required_nfts,
+					'downloadsUrl'             => \WNFTD\get_downloads_page_permalink(),
+				);
+				$data = \wp_json_encode( $data );
+
+				$js = <<<JS
+if ( window.wnftdData === undefined ) window.wnftdData = {};
+window.wnftdData = $data;
+JS;
+				\wp_add_inline_script(
+					$script,
+					$js,
+					'before'
+				);
+				break;
 		}
 	}
 

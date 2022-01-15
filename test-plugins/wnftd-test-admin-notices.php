@@ -13,6 +13,6 @@ namespace WNFTD\Test\Plugins;
 			return;
 		}
 
-		\WNFTD\admin()->notices->add_notice( 'test_notice', 'This is a test notice.' );
+		\WNFTD\instance()->admin_notices->add_notice( 'test_notice', 'This is a test notice.' );
 	}
 );

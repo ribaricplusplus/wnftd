@@ -9,8 +9,8 @@ class Products extends \WP_REST_Controller {
 
 	public function __construct( $product_controller ) {
 		$this->product_controller = $product_controller;
-		$this->namespace = 'wnftd/v1';
-		$this->rest_base = 'products';
+		$this->namespace          = 'wnftd/v1';
+		$this->rest_base          = 'products';
 	}
 
 	public function register_routes() {
@@ -38,7 +38,7 @@ class Products extends \WP_REST_Controller {
 				);
 			}
 
-			if ( empty( $request['_wpnonce'] ) || ! \wp_verify_nonce( $request['_wpnonce'], 'wnftd_product_download' ) ) {
+			if ( empty( $request['wnftd_product_nonce'] ) || ! \wp_verify_nonce( $request['wnftd_product_nonce'], 'wnftd_product_download' ) ) {
 				return new \WP_Error(
 					'wnftd_forbidden',
 					'Permission denied',
@@ -46,7 +46,7 @@ class Products extends \WP_REST_Controller {
 				);
 			}
 
-			$user = \wp_get_current_user();
+			$user    = \wp_get_current_user();
 			$product = new \WC_Product( $request['id'] );
 
 			if ( ! $this->product_controller->grant_access_by_nft( $user->ID, $product ) ) {
@@ -68,12 +68,12 @@ class Products extends \WP_REST_Controller {
 	}
 
 	public function get_download_link( $request ) {
-		$id = $request['id'];
-		$downloads = wc_get_customer_available_downloads( \get_current_user_id() );
+		$id                  = $request['id'];
+		$downloads           = wc_get_customer_available_downloads( \get_current_user_id() );
 		$requested_downloads = \wp_filter_object_list(
 			$downloads,
 			array(
-				'product_id' => $id
+				'product_id' => $id,
 			),
 		);
 
@@ -82,20 +82,20 @@ class Products extends \WP_REST_Controller {
 		return \rest_ensure_response(
 			array(
 				'code' => 'access_granted',
-				'data' => $data
+				'data' => $data,
 			)
 		);
 	}
 
 	public function get_args( $endpoint ) {
-		switch( $endpoint ) {
+		switch ( $endpoint ) {
 			case 'download':
 				return array(
 					'id' => array(
-						'type' => 'number',
+						'type'              => 'number',
 						'sanitize_callback' => 'absint',
-						'required' => true
-					)
+						'required'          => true,
+					),
 				);
 		}
 

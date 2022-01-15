@@ -86,3 +86,11 @@ function clean_unslash( $var ) {
 function product_controller() {
 	return instance()->product_controller;
 }
+
+function public_addresses_equal( $a, $b ) {
+	return strtolower( $a ) === strtolower( $b );
+}
+
+function get_downloads_page_permalink() {
+	return add_query_arg( 'downloads', 1, \wc_get_page_permalink( 'myaccount' ) );
+}

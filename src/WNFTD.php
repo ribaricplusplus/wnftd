@@ -17,6 +17,10 @@ class WNFTD {
 
 	public $product_controller;
 
+	public $templates_controller;
+
+	public $scripts_loader;
+
 	/**
 	 * @throws \Exception
 	 */
@@ -40,6 +44,7 @@ class WNFTD {
 		$this->auth->init();
 
 		$this->product_controller = new Product_Controller( $this->auth );
+		$this->product_controller->init();
 
 		try {
 			$this->ethereum = Factory::create_ethereum();
@@ -47,7 +52,11 @@ class WNFTD {
 			$this->fail_initialization( __( 'Failed to initialize Ethereum RPC', 'wnftd' ), 'fail_ethereum' );
 		}
 
-		( new Scripts_Loader() )->init();
+		$this->scripts_loader = new Scripts_Loader( $this->product_controller, $this->auth );
+		$this->scripts_loader->init();
+
+		$this->template_controller = new Template_Controller( $this->product_controller );
+		$this->template_controller->init();
 
 		\add_filter( 'woocommerce_data_stores', array( $this, 'register_data_stores' ) );
 
@@ -63,6 +72,7 @@ class WNFTD {
 				new Admin\Meta_Boxes\Product()
 			),
 			new Admin\Scripts(),
+			new Admin\Settings()
 		);
 		$this->admin->init();
 	}

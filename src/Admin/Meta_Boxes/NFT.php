@@ -49,7 +49,8 @@ class NFT implements Initializable {
 				'token_id'         => $_POST['token_id'] ?? \WNFTD\clean_unslash( $_POST['token_id'] ),
 				'contract_address' => $_POST['contract_address'] ?? \WNFTD\clean_unslash( $_POST['contract_address'] ),
 				'contract_type'    => $_POST['contract_type'] ?? \WNFTD\clean_unslash( $_POST['contract_type'] ),
-				'fake_owner'    => $_POST['fake_owner'] ?? \WNFTD\clean_unslash( $_POST['fake_owner'] ),
+				'fake_owner'       => $_POST['fake_owner'] ?? \WNFTD\clean_unslash( $_POST['fake_owner'] ),
+				'buy_url'          => $_POST['buy_url'] ?? \WNFTD\clean_unslash( $_POST['buy_url'] ),
 			)
 		);
 

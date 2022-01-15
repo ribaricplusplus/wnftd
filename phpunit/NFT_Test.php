@@ -67,10 +67,16 @@ class NFT_Test extends \WP_UnitTestCase {
 		$nft     = Factory::create_nft( self::$nft_ids[0] );
 		$address = '0x000123';
 		$nft->set_contract_address( $address );
+		$title = 'Some random title 231';
+		$nft->set_name( $title );
 		$nft->save();
 
 		$new_address = \get_post_meta( self::$nft_ids[0], 'contract_address', true );
+		$post        = \get_post( $nft->get_id() );
 		$this->assertEquals( $address, $new_address );
+
+		$nft = Factory::create_nft( $post->ID );
+		$this->assertEquals( $title, $nft->get_name() );
 	}
 
 	public function test_NFT_delete() {

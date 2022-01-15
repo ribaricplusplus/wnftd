@@ -52,8 +52,9 @@ class Authentication_Test extends \WP_Test_REST_TestCase {
 		$public_address = '0x1234';
 		\WNFTD\auth()->assign_public_address_to_user( $public_address, $old_owner_id );
 
-		$old_owner_addresses = \get_user_option( 'wnftd_public_addresses', $old_owner_id );
-		$new_owner_addresses = \get_user_option( 'wnftd_public_addresses', self::$user_id );
+		$old_owner_addresses = \WNFTD\auth()->get_public_addresses( $old_owner_id );
+		$new_owner_addresses = \WNFTD\auth()->get_public_addresses( self::$user_id );
+
 		if ( empty( $new_owner_addresses ) ) {
 			$new_owner_addresses = array();
 		}
@@ -72,8 +73,8 @@ class Authentication_Test extends \WP_Test_REST_TestCase {
 		$response = \rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$old_owner_addresses = \get_user_option( 'wnftd_public_addresses', $old_owner_id );
-		$new_owner_addresses = \get_user_option( 'wnftd_public_addresses', self::$user_id );
+		$old_owner_addresses = \WNFTD\auth()->get_public_addresses( $old_owner_id );
+		$new_owner_addresses = \WNFTD\auth()->get_public_addresses( self::$user_id );
 		$this->assertContains( $public_address, $new_owner_addresses );
 		$this->assertNotContains( $public_address, $old_owner_addresses );
 		$this->assertEquals( 'ownership_transferred', $data['code'] );
@@ -82,9 +83,9 @@ class Authentication_Test extends \WP_Test_REST_TestCase {
 	protected function _get_request( $params = array() ) {
 		$nonce    = \wp_create_nonce( 'wnftd_auth' );
 		$defaults = array(
-			'public_address' => '0x1234',
-			'signature'      => '0xaaaa',
-			'_wpnonce'       => $nonce,
+			'public_address'   => '0x1234',
+			'signature'        => '0xaaaa',
+			'wnftd_auth_nonce' => $nonce,
 		);
 		$params   = \wp_parse_args(
 			$params,

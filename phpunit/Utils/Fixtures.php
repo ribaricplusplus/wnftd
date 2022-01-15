@@ -5,7 +5,7 @@ namespace WNFTD\Test\Utils;
 use WNFTD\Factory;
 
 trait Fixtures {
-	public static $owner_address = '0x461b5dd073be81cad6752bfcc355d5a252b8e910';
+	public static $owner_address  = '0x461b5dd073be81cad6752bfcc355d5a252b8e910';
 	public static $random_address = '0x11d79df41dfa0bd51862e91f2e9395157fb36f3e';
 
 	public $sut_product;
@@ -25,7 +25,7 @@ trait Fixtures {
 				'contract_address' => '0xE106C63E655dF0E300b78336af587F300Cff9e76',
 				'token_id'         => '3684',
 				'contract_type'    => 'erc721',
-				'fake_owner' => self::$owner_address
+				'fake_owner'       => self::$owner_address,
 			)
 		);
 		$nft->save();
@@ -33,11 +33,11 @@ trait Fixtures {
 
 		$product->set_props(
 			array(
-				'name' => 'Test',
+				'name'         => 'Test',
 				'downloadable' => true,
-				'downloads' => array(
-					$download
-				)
+				'downloads'    => array(
+					$download,
+				),
 			)
 		);
 		$product->add_meta_data( 'wnftd_product_nft', $nft->get_id() );

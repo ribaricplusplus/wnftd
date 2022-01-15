@@ -30,10 +30,22 @@ class Product implements Initializable {
 	}
 
 	public function save_meta( $product ) {
-		$ids = $_POST['wnftd_product_nfts'] ?? array();
-		$ids = array_map( 'absint', $ids );
+		$ids          = $_POST['wnftd_product_nfts'] ?? array();
+		$ids          = array_map( 'absint', $ids );
+		$old_ids_meta = $product->get_meta( 'wnftd_product_nft', false );
+		$old_ids      = \wp_list_pluck( $old_ids_meta, 'value' );
+		$old_ids      = array_map( 'absint', $old_ids );
+
 		foreach ( $ids as $id ) {
-			$product->add_meta_data( 'wnftd_product_nft', $id );
+			if ( ! in_array( $id, $old_ids, true ) ) {
+				$product->add_meta_data( 'wnftd_product_nft', $id );
+			}
+		}
+
+		foreach ( $old_ids_meta as $old_id_meta ) {
+			if ( ! in_array( absint( $old_id_meta->value ), $ids, true ) ) {
+				$product->delete_meta_data_by_mid( $old_id_meta->id );
+			}
 		}
 	}
 

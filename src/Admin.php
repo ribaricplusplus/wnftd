@@ -16,6 +16,7 @@ class Admin implements Interfaces\Initializable {
 		$this->notices->init();
 		$this->meta_boxes->init();
 		$this->scripts->init();
+		$this->settings->init();
 
 		\add_filter( 'woocommerce_screen_ids', array( $this, 'add_woocommerce_screen_ids' ) );
 	}
@@ -26,10 +27,11 @@ class Admin implements Interfaces\Initializable {
 		return $screen_ids;
 	}
 
-	public function __construct( $notices, $meta_boxes, $scripts ) {
+	public function __construct( $notices, $meta_boxes, $scripts, $settings ) {
 		$this->notices    = $notices;
 		$this->meta_boxes = $meta_boxes;
 		$this->scripts    = $scripts;
+		$this->settings   = $settings;
 	}
 
 	public function add_notice( $name, $message ) {

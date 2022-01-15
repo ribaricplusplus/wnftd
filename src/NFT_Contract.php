@@ -12,7 +12,7 @@ abstract class NFT_Contract {
 	 * @return bool
 	 */
 	public function is_owner( $public_address, $nft ) {
-		return $public_address === $nft->get_fake_owner();
+		return \WNFTD\public_addresses_equal( $public_address, $nft->get_fake_owner() );
 	}
 
 	public function should_use_fake_owner( $nft ) {

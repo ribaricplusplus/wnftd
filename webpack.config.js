@@ -3,6 +3,6 @@ const baseConfig = require( '@wordpress/scripts/config/webpack.config.js' );
 module.exports = {
 	...baseConfig,
 	entry: {
-		// Entry points
+		'verify-nft-ownership': './js/verify-nft-ownership/index.js',
 	},
 };
