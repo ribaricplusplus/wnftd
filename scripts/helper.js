@@ -8,14 +8,14 @@ program
 	.action( () => {
 		const { printInstallPath } = require( './commands/get-install-path' );
 		printInstallPath();
-	} )
+	} );
 
 program
 	.command( 'zip' )
 	.description( 'Build and zip' )
 	.action( () => {
-		const command = require ( './commands/zip' )
-		command()
-	} )
+		const command = require( './commands/zip' );
+		command();
+	} );
 
 program.parse();
