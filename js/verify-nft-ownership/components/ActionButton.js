@@ -1,4 +1,5 @@
 import { Button, Link } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 
@@ -30,7 +31,7 @@ export default function ActionButton( { status, setStatus } ) {
 
 		try {
 			if ( userOwnedPublicAddresses.includes( publicAddress ) ) {
-				setStatus( { ...status, state: 'loading' } )
+				setStatus( { ...status, state: 'loading' } );
 
 				await requestProductDownload();
 
@@ -40,10 +41,9 @@ export default function ActionButton( { status, setStatus } ) {
 					severity: 'success',
 				} );
 
-				setStatus( { ...status, state: 'verified' } )
-
+				setStatus( { ...status, state: 'verified' } );
 			} else if ( publicAddress ) {
-				setStatus( { ...status, state: 'loading' } )
+				setStatus( { ...status, state: 'loading' } );
 
 				await requestPublicAddressVerification();
 
@@ -58,7 +58,7 @@ export default function ActionButton( { status, setStatus } ) {
 				setStatus( { ...status, state: 'verified' } );
 			}
 		} catch ( e ) {
-			setStatus( { ...status, state: 'error' } )
+			setStatus( { ...status, state: 'error' } );
 			await handleError( e, addMessage );
 		}
 	};
@@ -71,12 +71,16 @@ export default function ActionButton( { status, setStatus } ) {
 			</Button>
 		);
 	} else {
-		const isLoading = status.state === 'loading'
+		const isLoading = status.state === 'loading';
 
 		return (
-			<Button loading={isLoading ? "1" : undefined } onClick={ isLoading ? null : clickHandler } variant="contained">
+			<LoadingButton
+				loading={ isLoading }
+				onClick={ isLoading ? null : clickHandler }
+				variant="contained"
+			>
 				Verify ownership
-			</Button>
+			</LoadingButton>
 		);
 	}
 }
