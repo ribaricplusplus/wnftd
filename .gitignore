@@ -31,3 +31,4 @@ phpunit-watcher.yml
 .phpunit.result.cache
 .vscode/
 secrets.php
+woocommerce-nft-downloads.zip

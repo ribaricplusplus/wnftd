@@ -15,7 +15,7 @@ program
 	.description( 'Build and zip' )
 	.action( () => {
 		const command = require ( './commands/zip' )
-		zip()
+		command()
 	} )
 
 program.parse();
