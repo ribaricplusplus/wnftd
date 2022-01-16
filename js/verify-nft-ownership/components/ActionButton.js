@@ -74,7 +74,7 @@ export default function ActionButton( { status, setStatus } ) {
 		const isLoading = status.state === 'loading'
 
 		return (
-			<Button { isLoading && loading } onClick={ isLoading ? null : clickHandler } variant="contained">
+			<Button loading={isLoading ? "1" : undefined } onClick={ isLoading ? null : clickHandler } variant="contained">
 				Verify ownership
 			</Button>
 		);
