@@ -1,5 +1,4 @@
 const glob = require ( 'glob-all' )
-const AdmZip = require ( 'adm-zip' )
 const path = require('path')
 const { execSync } = require('child_process')
 const fs = require('fs')
@@ -23,14 +22,9 @@ async function main() {
 		'!**/*.map',
 	]
 
-	const files = glob.sync(patterns).filter( (file) => ! isDirectory( file ) )
+	const files = glob.sync(patterns).filter( (file) => ! isDirectory( file ) ).join( '\n' )
 
-	const zip = new AdmZip()
-	for( const file of files ) {
-		zip.addLocalFile( file )
-	}
-
-	zip.writeZip( path.join( ROOT_DIR, 'woocommerce-nft-downloads.zip' ) )
+	execSync( 'zip -@ woocommerce-nft-downloads', { input: files } )
 }
 
 function buildJavaScript() {
