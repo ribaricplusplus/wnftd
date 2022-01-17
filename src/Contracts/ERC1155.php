@@ -47,57 +47,23 @@ class ERC1155 extends \WNFTD\NFT_Contract {
 	/**
 	 * The Ethereum library seems to give incorrectly encoded data... Easier to
 	 * write a function from scratch than to debug what's going on there.
+	 *
+	 * @throws \Exception
 	 */
 	public function get_balance_of_json_rpc( $public_address, $token_id ) {
 		if ( ! is_numeric( $token_id ) || ! is_string( 'public_address' ) ) {
 			throw new \InvalidArgumentException();
 		}
 
-		$json               = array(
-			'id'      => \wp_generate_uuid4(),
-			'jsonrpc' => '2.0',
-			'method'  => 'eth_call',
-			'params'  => array(
-				array(
-					'to' => $this->contract_address,
-				),
-			),
-		);
+		$json               = $this->get_json_rpc_base();
 		$function_signature = 'balanceOf(address,uint256)';
 		$hash               = Keccak::Hash( $function_signature, 256 );
 		$data               = '0x' . substr( $hash, 0, 8 );
-		$data              .= str_pad( ltrim( $public_address, '0x' ), 32 * 2, '0', \STR_PAD_LEFT );
-		$data              .= str_pad( (string) dechex( $token_id ), 32 * 2, '0', \STR_PAD_LEFT );
+		$data              .= $this->encode_type( 'address', $public_address );
+		$data              .= $this->encode_type( 'uint256', $token_id );
 
 		$json['params'][0]['data'] = $data;
 		return $json;
-	}
-
-	/**
-	 * @param array $response
-	 * @throws \InvalidArgumentException
-	 * @return int
-	 */
-	public function get_balance_from_response( $response ) {
-		if ( \is_wp_error( $response ) ) {
-			throw new \InvalidArgumentException();
-		}
-
-		if ( ! \is_array( $response ) ) {
-			throw new \InvalidArgumentException();
-		}
-
-		if ( ! absint( $response['code'] ) === 200 ) {
-			throw new \InvalidArgumentException();
-		}
-
-		$json = \json_decode( $response['body'], true, \JSON_BIGINT_AS_STRING );
-
-		if ( empty( $json ) || empty( $json['result'] ) ) {
-			throw new \InvalidArgumentException();
-		}
-
-		return hexdec( $hexbalance );
 	}
 
 }

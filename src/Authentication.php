@@ -7,7 +7,9 @@ defined( 'ABSPATH' ) || exit;
 use Ethereum\EcRecover;
 
 class Authentication implements Interfaces\Initializable {
-	public function init() {}
+	public function init() {
+		\add_action( 'saved_wnftd_public_address', array( $this, 'force_lowercase_term_name' ) );
+	}
 
 	/**
 	 * @param string $public_address
@@ -17,7 +19,8 @@ class Authentication implements Interfaces\Initializable {
 	 */
 	public function verify_public_address( $public_address, $message, $signature ) {
 		try {
-			$recovered = EcRecover::personalEcRecover( $message, $signature );
+			$public_address = strtolower( $public_address );
+			$recovered      = EcRecover::personalEcRecover( $message, $signature );
 			if ( $recovered === $public_address ) {
 				return true;
 			}
@@ -36,6 +39,8 @@ class Authentication implements Interfaces\Initializable {
 	 * @return int|null
 	 */
 	public function get_user_by_public_address( $public_address ) {
+		$public_address = strtolower( $public_address );
+
 		$term = $this->get_public_address_term( $public_address );
 
 		if ( empty( $term ) ) {
@@ -69,6 +74,8 @@ class Authentication implements Interfaces\Initializable {
 	 * @param string $public_address
 	 */
 	public function transfer_address_ownership( $old_owner, $new_owner, $public_address ) {
+		$public_address = strtolower( $public_address );
+
 		$this->unassign_public_address_from_user( $public_address, $old_owner );
 
 		$this->assign_public_address_to_user( $public_address, $new_owner );
@@ -79,6 +86,7 @@ class Authentication implements Interfaces\Initializable {
 	 * @param int    $user_id
 	 */
 	public function assign_public_address_to_user( $public_address, $user_id ) {
+		$public_address = strtolower( $public_address );
 
 		if ( ! \term_exists( $public_address ) ) {
 			\wp_insert_term( $public_address, 'wnftd_public_address' );
@@ -102,7 +110,8 @@ class Authentication implements Interfaces\Initializable {
 		if ( is_object( $user ) ) {
 			$user = $user->ID;
 		}
-		\wc_set_customer_auth_cookie( $user );
+		wp_set_current_user( $user );
+		wp_set_auth_cookie( $user, true );
 	}
 
 	/**
@@ -111,6 +120,8 @@ class Authentication implements Interfaces\Initializable {
 	 * @return int User ID.
 	 */
 	public function create_new_user( $public_address ) {
+		$public_address = strtolower( $public_address );
+
 		$email = sprintf( '%s@example.com', \wp_generate_uuid4() );
 		if ( $this->public_address_exists( $public_address ) ) {
 			throw new \Exception( 'Cannot create a new user for a public address that already exists.' );
@@ -154,6 +165,8 @@ class Authentication implements Interfaces\Initializable {
 	}
 
 	public function public_address_exists( $public_address ) {
+		$public_address = strtolower( $public_address );
+
 		return (bool) get_term_by( 'name', $public_address, 'wnftd_public_address' );
 	}
 
@@ -175,4 +188,25 @@ class Authentication implements Interfaces\Initializable {
 
 		return \wp_list_pluck( $terms, 'name' );
 	}
+
+	public function force_lowercase_term_name( $term_id ) {
+		static $already_saving;
+
+		if ( $already_saving ) {
+			return;
+		}
+
+		$already_saving = true;
+
+		$term          = \get_term( $term_id );
+		$has_uppercase = preg_match( '/[A-Z]/', $term->name );
+
+		if ( $has_uppercase ) {
+			$updated = \wp_update_term( $term->term_id, 'wnftd_public_address', array( 'name' => strtolower( $term->name ) ) );
+			if ( ! $updated ) {
+				throw new \Exception( 'Term update failed.' );
+			}
+		}
+	}
+
 }

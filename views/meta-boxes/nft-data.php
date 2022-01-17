@@ -9,6 +9,9 @@ $nft = empty( $post ) || empty( $post->ID ) ? \WNFTD\Factory::create_nft() : \WN
 
 ?>
 <div class="panel woocommerce_options_panel">
+	<p>
+		<?php printf( __( 'Token ID can be left empty for ERC721 contracts, in which case the plugin will check for ownership of any NFTs in that collection. "Fake owner" is used for testing purpsoes and can be ignored.', 'wnftd' ) ); ?>
+	</p>
 	<?php
 		\woocommerce_wp_text_input(
 			array(

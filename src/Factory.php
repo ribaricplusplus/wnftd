@@ -58,13 +58,13 @@ class Factory {
 
 		switch ( $data['contract_type'] ) {
 			case 'erc721':
-				$instance                 = new Contracts\ERC721( $data['contract_address'] );
-				$abi                      = json_decode( file_get_contents( plugin_dir_path( \WNFTD_FILE ) . 'contracts/erc721abi.json' ) );
-				$instance->smart_contract = new \Ethereum\SmartContract(
+				$abi            = json_decode( file_get_contents( plugin_dir_path( \WNFTD_FILE ) . 'contracts/erc721abi.json' ) );
+				$smart_contract = new \Ethereum\SmartContract(
 					$abi,
 					$data['contract_address'],
 					\WNFTD\instance()->ethereum
 				);
+				$instance       = new Contracts\ERC721( $smart_contract, self::create_request(), $data['contract_address'] );
 				break;
 			case 'erc1155':
 				$instance                   = new Contracts\ERC1155();
@@ -84,5 +84,9 @@ class Factory {
 			return new Ethereum( $api_key );
 		}
 		return new Ethereum();
+	}
+
+	public static function create_request() {
+		return new \WNFTD\Request();
 	}
 }

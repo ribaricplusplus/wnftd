@@ -3,9 +3,11 @@
 namespace WNFTD\Test;
 
 use WNFTD\Factory;
+use Ethereum\DataType;
+use WNFTD\Contracts;
 
-class NFT_Contract_Test {
-	use Utils\NFT;
+class NFT_Contract_Test extends \WP_UnitTestCase {
+	use Utils\NFT, Utils\Request;
 
 	public function test_ERC721_owner() {
 		$data = self::$nfts['exclusive_oxyan'];
@@ -18,7 +20,7 @@ class NFT_Contract_Test {
 		->getMock();
 
 		$contract->smart_contract->method( 'ownerOf' )
-		->willReturn( $data['owner'] );
+		->willReturn( new DataType\EthD( $data['owner'] ) );
 
 		$this->assertNotEmpty( $contract->get_owner( $nft ) );
 	}
@@ -53,6 +55,43 @@ class NFT_Contract_Test {
 		$this->assertEquals( $expected_balance, $sut->get_balance_from_response( $response ) );
 	}
 
+	/**
+	 * @dataProvider valid_balance_from_response_data
+	 */
+	public function test_ERC721_owner_without_token_id( $response, $balance ) {
+		$nft_data = array(
+			'contract_address' => '0xE106C63E655dF0E300b78336af587F300Cff9e76',
+			'contract_type'    => 'erc721',
+		);
+
+		$nft = Factory::create_nft( $nft_data );
+
+		$owner = '0x461b5dd073be81cad6752bfcc355d5a252b8e910';
+
+		$mock_request = $this->createStub( \WNFTD\Request::class );
+		$mock_request->method( 'post' )
+			->willReturn( $response );
+
+		$contract          = Factory::create_nft_contract( $nft );
+		$contract->request = $mock_request;
+
+		if ( $balance > 0 ) {
+			$this->assertTrue( $contract->is_owner( $owner ) );
+		} else {
+			$this->assertFalse( $contract->is_owner( $owner ) );
+		}
+	}
+
+	public function test_ERC721_json_rpc_data_when_no_token_id() {
+		$data         = self::$nfts['exclusive_oxyan'];
+		$encoded_data = '0x70a08231000000000000000000000000461b5dd073be81cad6752bfcc355d5a252b8e910';
+
+		$contract = Factory::create_nft_contract( $data );
+		$json     = $contract->get_balance_of_json_rpc( $data['owner'] );
+
+		$this->assertEquals( $encoded_data, $json['params'][0]['data'] );
+	}
+
 	public function valid_balance_from_response_data() {
 		$base = array(
 			'id'      => '797cd950-3f7c-4fcc-8b0d-f243766e5eb5',
@@ -62,13 +101,12 @@ class NFT_Contract_Test {
 		$results = array( '0x0000000000000000000000000000000000000000000000000000000000000001', '0x0000000000000000000000000000000000000000000000000000000000000002', '0x00000000000000000000000000000000000000000000000000000000000000010', '0x0000000000000000000000000000000000000000000000000000000000000000' );
 
 		foreach ( $results as $result ) {
-			$rr              = new \Requests_Response();
-			$rr->body        = \wp_json_encode( array_merge( $base, array( 'result' => $result ) ) );
-			$rr->success     = true;
-			$rr->status_code = 200;
-			$response        = new \WP_HTTP_Requests_Response( $rr );
-			$data[]          = array(
-				$response->to_array(),
+			$data[] = array(
+				$this->create_response(
+					array(
+						'body' => \wp_json_encode( array_merge( $base, array( 'result' => $result ) ) ),
+					)
+				),
 				hexdec( $result ),
 			);
 		}
