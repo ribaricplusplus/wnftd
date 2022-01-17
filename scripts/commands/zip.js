@@ -8,6 +8,7 @@ const ROOT_DIR = path.join( __dirname, '../..' );
 async function main() {
 	process.chdir( ROOT_DIR );
 
+	execSync( 'composer install --no-dev', { stdio: 'inherit' } );
 	buildJavaScript();
 
 	const patterns = [
@@ -17,6 +18,7 @@ async function main() {
 		'build/**/*',
 		'contracts/**/*',
 		'views/**/*',
+		'!vendor/digitaldonkey/ethereum-php/tests/**/*',
 		'!secrets.php',
 		'!**/*.map',
 	];

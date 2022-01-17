@@ -1,6 +1,6 @@
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Stack, Typography } from '@mui/material';
+import { Stack, Typography, Alert } from '@mui/material';
 import { __ } from '@wordpress/i18n';
 
 import { STORE_NAME } from './store';
@@ -26,7 +26,7 @@ export default function App() {
 
 	if ( ! hasMetaMask() ) {
 		return (
-			<Stack>
+			<Stack sx={{ marginBottom: '15px' }}>
 				<Alert severity="info">
 					{ __(
 						'This product can only be downloaded by the owners of specific NFTs. MetaMask was not detected in the current browser to confirm NFT ownership.',
