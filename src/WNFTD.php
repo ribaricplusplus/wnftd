@@ -36,6 +36,10 @@ class WNFTD {
 			$this->fail_initialization( sprintf( __( 'Missing plugins: %s', 'wnftd' ), $names ), 'fail_missing_plugins' );
 		}
 
+		if ( ! \WNFTD\is_extension_loaded( 'gmp' ) ) {
+			$this->fail_initialization( __( 'Missing GMP extension.', 'wnftd' ) );
+		}
+
 		if ( \is_admin() ) {
 			$this->init_admin();
 		}

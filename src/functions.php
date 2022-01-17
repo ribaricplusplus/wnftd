@@ -94,3 +94,13 @@ function public_addresses_equal( $a, $b ) {
 function get_downloads_page_permalink() {
 	return add_query_arg( 'downloads', 1, \wc_get_page_permalink( 'myaccount' ) );
 }
+
+function is_extension_loaded( $extension ) {
+	$is_loaded = \extension_loaded( $extension );
+
+	return \apply_filters(
+		'wnftd_is_extension_loaded',
+		$is_loaded,
+		$extension
+	);
+}
