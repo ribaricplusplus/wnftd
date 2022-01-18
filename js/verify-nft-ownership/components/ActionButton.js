@@ -4,7 +4,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 
 import { STORE_NAME } from '../store';
-import { getPublicAddress, getChainName } from '../util';
+import {
+	getPublicAddress,
+	getChainName,
+	getNetworkSwitchMessage,
+} from '../util';
 
 export default function ActionButton( { status, setStatus } ) {
 	const { userOwnedPublicAddresses } = useSelect(
@@ -99,12 +103,8 @@ async function handleError( e, addMessage ) {
 	} else if ( e.code === 'chain_id_mismatch' ) {
 		await addMessage( {
 			name: 'chain_id_mismatch',
-			message: sprintf(
-				__(
-					'Your wallet account is not on the same network as the required NFTs. Please use an account connected to %s.',
-					'wnftd'
-				),
-				getChainName( e?.additionalData?.productChainId )
+			message: getNetworkSwitchMessage(
+				e?.additionalData?.productChainId
 			),
 		} );
 	} else {

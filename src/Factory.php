@@ -49,7 +49,7 @@ class Factory {
 			$data = array(
 				'contract_address' => $data->get_contract_address(),
 				'contract_type'    => $data->get_contract_type(),
-				'network' => $data->get_network()
+				'network'          => $data->get_network(),
 			);
 		}
 

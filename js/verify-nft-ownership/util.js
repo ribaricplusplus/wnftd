@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { dispatch } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
 import { STORE_NAME } from './store';
 
 let provider = null;
@@ -72,9 +73,25 @@ export async function getWeb3Signer() {
 	const signerChainId = await signer.getChainId();
 
 	if ( productChainId !== signerChainId ) {
-		throw new errorFactory( 'chain_id_mismatch', {
-			productChainId,
-		} );
+		try {
+			await dispatch( STORE_NAME ).addMessage( {
+				name: 'chain_id_mismatch',
+				message: getNetworkSwitchMessage( productChainId ),
+			} );
+			const ret = await window.ethereum.request( {
+				method: 'wallet_switchEthereumChain',
+				params: [ { chainId: '0x' + productChainId.toString( 16 ) } ],
+			} );
+			if ( ret !== null ) {
+				throw new Error();
+			} else {
+				window.location.reload();
+			}
+		} catch ( e ) {
+			throw new errorFactory( 'chain_id_mismatch', {
+				productChainId,
+			} );
+		}
 	}
 
 	return signer;
@@ -96,4 +113,14 @@ export async function getPublicAddress() {
 	const signer = await getWeb3Signer();
 	const publicAddress = ( await signer.getAddress() ).toLowerCase();
 	return publicAddress;
+}
+
+export function getNetworkSwitchMessage( chainId ) {
+	return sprintf(
+		__(
+			'Your wallet account is not on the same network as the required NFTs. Please use an account connected to %s.',
+			'wnftd'
+		),
+		getChainName( chainId )
+	);
 }

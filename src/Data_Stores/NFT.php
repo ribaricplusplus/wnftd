@@ -74,7 +74,7 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 				'fake_owner'       => $fake_owner,
 				'image_id'         => \get_post_thumbnail_id( $post->ID ),
 				'buy_url'          => $buy_url,
-				'network'          => ! empty ( $network ) ? $network : 'polygon',
+				'network'          => ! empty( $network ) ? $network : 'polygon',
 			)
 		);
 
