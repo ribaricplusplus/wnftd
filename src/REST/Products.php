@@ -21,7 +21,7 @@ class Products extends \WP_REST_Controller {
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_download_link' ),
-					'permission_callback' => array( $this, 'permission_callback' ),
+					'permission_callback' => '__return_true',
 					'args'                => $this->get_args( 'download' ),
 				),
 			)
@@ -68,6 +68,20 @@ class Products extends \WP_REST_Controller {
 	}
 
 	public function get_download_link( $request ) {
+		$has_permission = $this->permission_callback( $request );
+
+		if ( is_wp_error( $has_permission ) ) {
+			return $has_permission;
+		}
+
+		if ( empty( $has_permission ) ) {
+			return new \WP_Error(
+				'wnftd_forbidden',
+				'Permission denied',
+				array( 'status' => 401 )
+			);
+		}
+
 		$id                  = $request['id'];
 		$downloads           = wc_get_customer_available_downloads( \get_current_user_id() );
 		$requested_downloads = \wp_filter_object_list(

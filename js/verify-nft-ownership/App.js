@@ -26,7 +26,7 @@ export default function App() {
 
 	if ( ! hasMetaMask() ) {
 		return (
-			<Stack sx={{ marginBottom: '15px' }}>
+			<Stack sx={ { marginBottom: '15px' } }>
 				<Alert severity="info">
 					{ __(
 						'This product can only be downloaded by the owners of specific NFTs. MetaMask was not detected in the current browser to confirm NFT ownership.',

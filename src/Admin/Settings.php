@@ -21,10 +21,18 @@ class Settings implements Initializable {
 
 		$settings[] = array(
 			'title'    => __( 'Ethereum API URL', 'wnftd' ),
-			'desc'     => __( 'This URL will be used to read blockchain information, e.g. verify if public address owns NFT.' ),
+			'desc'     => __( 'This URL will be used to read Ethereum blockchain information, e.g. verify if public address owns NFT.' ),
 			'type'     => 'text',
 			'desc_tip' => true,
 			'id'       => 'wnftd_rpc_api_key',
+		);
+
+		$settings[] = array(
+			'title'    => __( 'Polygon API URL', 'wnftd' ),
+			'desc'     => __( 'This URL will be used to read Polygon blockchain information.' ),
+			'type'     => 'text',
+			'desc_tip' => true,
+			'id'       => 'wnftd_rpc_api_key_polygon',
 		);
 
 		$settings[] = array(

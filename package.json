@@ -48,6 +48,7 @@
 		"@wordpress/dom-ready": "3.2.3",
 		"@wordpress/element": "4.0.4",
 		"@wordpress/i18n": "4.2.4",
+		"ethers": "5.5.3",
 		"lodash": "4.17.21"
 	}
 }

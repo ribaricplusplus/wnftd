@@ -6,7 +6,20 @@ defined( 'ABSPATH' ) || exit;
 
 abstract class NFT_Contract {
 
+	/** @var string */
 	public $contract_address;
+
+	/** @var string */
+	public $network;
+
+	/** @var string */
+	public $api_url;
+
+	public function __construct( $contract_address = '', $network = 'polygon' ) {
+		$this->contract_address = $contract_address;
+		$this->network          = $network;
+		$this->api_url          = \WNFTD\get_api_key( $network );
+	}
 
 	/**
 	 * @param string $public_address

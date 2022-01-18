@@ -54,14 +54,19 @@ function filter_keys( $arr, $keys ) {
 	);
 }
 
-function get_api_key( $force = false ) {
-	static $api_key;
+/**
+ * @throws \Exception
+ */
+function get_api_key( $network = 'ethereum' ) {
+	$valid_networks = get_valid_networks();
 
-	if ( ! empty( $api_key ) && ! $force ) {
-		return $api_key;
+	if ( ! is_valid_network( $network ) ) {
+		throw new \InvalidArgumentException();
 	}
 
-	$api_key = \get_option( 'wnftd_rpc_api_key' );
+	$key = $valid_networks[ $network ]['rpc_option'];
+
+	$api_key = \get_option( $key );
 
 	if ( $api_key ) {
 		return $api_key;
@@ -75,8 +80,7 @@ function get_api_key( $force = false ) {
 		}
 	}
 
-	$api_key = null;
-	return $api_key;
+	throw new \Exception( 'RPC URL not found.' );
 }
 
 function clean_unslash( $var ) {
@@ -103,4 +107,21 @@ function is_extension_loaded( $extension ) {
 		$is_loaded,
 		$extension
 	);
+}
+
+function get_valid_networks() {
+	return array(
+		'ethereum' => array(
+			'chain_id'   => 1,
+			'rpc_option' => 'wnftd_rpc_api_key',
+		),
+		'polygon'  => array(
+			'chain_id'   => 137,
+			'rpc_option' => 'wnftd_rpc_api_key_polygon',
+		),
+	);
+}
+
+function is_valid_network( $network ) {
+	return in_array( $network, array_keys( get_valid_networks() ) );
 }

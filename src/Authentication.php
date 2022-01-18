@@ -190,14 +190,8 @@ class Authentication implements Interfaces\Initializable {
 	}
 
 	public function force_lowercase_term_name( $term_id ) {
-		static $already_saving;
-
-		if ( $already_saving ) {
-			return;
-		}
-
-		$already_saving = true;
-
+		// This will not be an infinite loop because next time the term is
+		// saved, the regex will not match.
 		$term          = \get_term( $term_id );
 		$has_uppercase = preg_match( '/[A-Z]/', $term->name );
 

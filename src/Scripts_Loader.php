@@ -61,20 +61,29 @@ class Scripts_Loader implements Interfaces\Initializable {
 				}
 				$auth_nonce = \wp_create_nonce( 'wnftd_auth' );
 
-				$required_nfts = $this->product_controller->get_required_nfts_ids( $product );
-				$required_nfts = array_map( array( '\\WNFTD\\Factory', 'create_nft' ), $required_nfts );
-				$required_nfts = array_values(
+				$valid_networks = \WNFTD\get_valid_networks();
+				$required_nfts  = $this->product_controller->get_required_nfts_ids( $product );
+				$required_nfts  = array_map( array( '\\WNFTD\\Factory', 'create_nft' ), $required_nfts );
+				$required_nfts  = array_values(
 					array_map(
 						function( $nft ) {
 							return array(
-								'name'   => $nft->get_name(),
-								'image'  => $nft->get_image_id() ? \wp_get_attachment_image_url( $nft->get_image_id() ) : '',
-								'buyUrl' => $nft->get_buy_url(),
+								'name'    => $nft->get_name(),
+								'image'   => $nft->get_image_id() ? \wp_get_attachment_image_url( $nft->get_image_id() ) : '',
+								'buyUrl'  => $nft->get_buy_url(),
+								'network' => $nft->get_network(),
 							);
 						},
 						$required_nfts
 					)
 				);
+				if ( empty( $required_nfts ) ) {
+					$chain_id = 0;
+				} else {
+					$nft      = $required_nfts[0];
+					$network  = $valid_networks[ $nft['network'] ];
+					$chain_id = $network['chain_id'];
+				}
 
 				$data = array(
 					'userLoggedIn'             => \is_user_logged_in(),
@@ -87,6 +96,7 @@ class Scripts_Loader implements Interfaces\Initializable {
 					'productId'                => $product->get_id(),
 					'requiredNfts'             => $required_nfts,
 					'downloadsUrl'             => \WNFTD\get_downloads_page_permalink(),
+					'chainId'                  => $chain_id,
 				);
 				$data = \wp_json_encode( $data );
 

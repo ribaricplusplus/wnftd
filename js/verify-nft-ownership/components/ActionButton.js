@@ -1,9 +1,10 @@
 import { Button, Link } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 
 import { STORE_NAME } from '../store';
+import { getPublicAddress, getChainName } from '../util';
 
 export default function ActionButton( { status, setStatus } ) {
 	const { userOwnedPublicAddresses } = useSelect(
@@ -14,7 +15,6 @@ export default function ActionButton( { status, setStatus } ) {
 		} ),
 		[]
 	);
-	const { getPublicAddress } = useSelect( STORE_NAME );
 	const {
 		requestPublicAddressVerification,
 		requestProductDownload,
@@ -24,12 +24,10 @@ export default function ActionButton( { status, setStatus } ) {
 	const registry = useRegistry();
 
 	const clickHandler = async () => {
-		await clearMessages();
-		const publicAddress = await registry
-			.resolveSelect( STORE_NAME )
-			.getPublicAddress();
-
 		try {
+			await clearMessages();
+			const publicAddress = await getPublicAddress();
+
 			if ( userOwnedPublicAddresses.includes( publicAddress ) ) {
 				setStatus( { ...status, state: 'loading' } );
 
@@ -98,7 +96,19 @@ async function handleError( e, addMessage ) {
 			message: __( 'NFT Ownership verification failed.', 'wnftd' ),
 			severity: 'error',
 		} );
+	} else if ( e.code === 'chain_id_mismatch' ) {
+		await addMessage( {
+			name: 'chain_id_mismatch',
+			message: sprintf(
+				__(
+					'Your wallet account is not on the same network as the required NFTs. Please use an account connected to %s.',
+					'wnftd'
+				),
+				getChainName( e?.additionalData?.productChainId )
+			),
+		} );
 	} else {
+		console.error( e );
 		await addMessage( {
 			name: 'error_occurred',
 			message: __( 'An error occurred.', 'wnftd' ),

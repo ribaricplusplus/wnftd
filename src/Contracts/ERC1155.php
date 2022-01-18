@@ -7,7 +7,6 @@ defined( 'ABSPATH' ) || exit;
 use kornrunner\Keccak;
 
 class ERC1155 extends \WNFTD\NFT_Contract {
-	public $contract_address;
 
 	/**
 	 * @param string $public_address
@@ -39,7 +38,7 @@ class ERC1155 extends \WNFTD\NFT_Contract {
 	public function get_balance( $public_address, $nft ) {
 		$json     = $this->get_balance_of_json_rpc( $public_address, $nft->get_token_id() );
 		$json     = wp_json_encode( $json );
-		$response = \wp_remote_post( \WNFTD\get_api_key(), array( 'body' => $json ) );
+		$response = \wp_remote_post( $this->api_url, array( 'body' => $json ) );
 
 		return $this->get_balance_from_response( $response );
 	}

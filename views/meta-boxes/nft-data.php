@@ -49,6 +49,20 @@ $nft = empty( $post ) || empty( $post->ID ) ? \WNFTD\Factory::create_nft() : \WN
 		?>
 
 	<?php
+		\woocommerce_wp_select(
+			array(
+				'id'      => 'network',
+				'value'   => $nft->get_network(),
+				'label'   => __( 'Network', 'wnftd' ),
+				'options' => array(
+					'polygon'  => 'Polygon',
+					'ethereum' => 'Ethereum',
+				),
+			)
+		);
+		?>
+
+	<?php
 		\woocommerce_wp_text_input(
 			array(
 				'id'    => 'buy_url',

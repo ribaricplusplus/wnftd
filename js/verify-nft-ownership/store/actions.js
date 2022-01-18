@@ -1,6 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
 
-import { errorFactory } from '../util';
+import { errorFactory, getPublicAddress, getWeb3Signer } from '../util';
 
 export function setUserLoggedIn( loggedIn ) {
 	return {
@@ -111,12 +111,10 @@ export function addUserOwnedPublicAddress( publicAddress ) {
 export function requestPublicAddressVerification() {
 	return async ( { dispatch, select, resolveSelect } ) => {
 		const message = await select.getMessageForSigning();
-		const account = await resolveSelect.getPublicAddress();
+		const signer = await getWeb3Signer();
 
-		const signature = await ethereum.request( {
-			method: 'personal_sign',
-			params: [ message, account ],
-		} );
+		const account = await getPublicAddress();
+		const signature = await signer.signMessage( message );
 
 		if ( ! signature ) {
 			throw new Error( 'Failed to get signature.' );

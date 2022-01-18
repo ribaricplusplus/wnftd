@@ -13,6 +13,7 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 		'fake_owner',
 		'_thumbnail_id',
 		'buy_url',
+		'network',
 	);
 
 	protected $meta_type = 'post';
@@ -61,6 +62,7 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 		$contract_type    = \get_post_meta( $post->ID, 'contract_type', true );
 		$fake_owner       = \get_post_meta( $post->ID, 'fake_owner', true );
 		$buy_url          = \get_post_meta( $post->ID, 'buy_url', true );
+		$network          = \get_post_meta( $post->ID, 'network', true );
 
 		$data->set_props(
 			array(
@@ -72,6 +74,7 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 				'fake_owner'       => $fake_owner,
 				'image_id'         => \get_post_thumbnail_id( $post->ID ),
 				'buy_url'          => $buy_url,
+				'network'          => $network,
 			)
 		);
 
@@ -149,12 +152,20 @@ class NFT extends \WC_Data_Store_WP implements \WC_Object_Data_Store_Interface {
 			'contract_type'    => 'contract_type',
 			'fake_owner'       => 'fake_owner',
 			'buy_url'          => 'buy_url',
+			'network'          => 'network',
 		);
 
 		$props_to_update = $force ? $meta_key_to_props : $this->get_props_to_update( $data, $meta_key_to_props );
 
 		foreach ( $props_to_update as $meta_key => $prop ) {
 			$value = $data->{"get_$prop"}( 'edit' );
+			switch ( $prop ) {
+				case 'network':
+					if ( ! \WNFTD\is_valid_network( $value ) ) {
+						$value = 'polygon';
+					}
+					break;
+			}
 			$this->update_or_delete_post_meta( $data, $meta_key, $value );
 		}
 	}

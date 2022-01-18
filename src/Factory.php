@@ -56,19 +56,25 @@ class Factory {
 			throw new \InvalidArgumentException();
 		}
 
+		$data = \wp_parse_args(
+			$data,
+			array(
+				'network' => 'polygon',
+			)
+		);
+
 		switch ( $data['contract_type'] ) {
 			case 'erc721':
 				$abi            = json_decode( file_get_contents( plugin_dir_path( \WNFTD_FILE ) . 'contracts/erc721abi.json' ) );
 				$smart_contract = new \Ethereum\SmartContract(
 					$abi,
 					$data['contract_address'],
-					\WNFTD\instance()->ethereum
+					self::create_ethereum( $data['network'] )
 				);
-				$instance       = new Contracts\ERC721( $smart_contract, self::create_request(), $data['contract_address'] );
+				$instance       = new Contracts\ERC721( $smart_contract, self::create_request(), $data['contract_address'], $data['network'] );
 				break;
 			case 'erc1155':
-				$instance                   = new Contracts\ERC1155();
-				$instance->contract_address = $data['contract_address'];
+				$instance = new Contracts\ERC1155( $data['contract_address'], $data['network'] );
 				break;
 			default:
 				throw new \UnexpectedValueException();
@@ -77,12 +83,16 @@ class Factory {
 		return $instance;
 	}
 
-	public static function create_ethereum() {
-		$api_key = \WNFTD\get_api_key();
+	/**
+	 * @throws \Exception
+	 */
+	public static function create_ethereum( $network = 'ethereum' ) {
+		$api_key = \WNFTD\get_api_key( $network );
 
 		if ( ! empty( $api_key ) ) {
 			return new Ethereum( $api_key );
 		}
+
 		return new Ethereum();
 	}
 

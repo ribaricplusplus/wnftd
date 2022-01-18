@@ -21,10 +21,10 @@ class ERC721 extends \WNFTD\NFT_Contract {
 
 	public $contract_address;
 
-	public function __construct( $smart_contract = null, $request = null, $contract_address = '' ) {
-		$this->smart_contract   = $smart_contract;
-		$this->request          = $request;
-		$this->contract_address = $contract_address;
+	public function __construct( $smart_contract = null, $request = null, $contract_address = '', $network = 'polygon' ) {
+		parent::__construct( $contract_address, $network );
+		$this->smart_contract = $smart_contract;
+		$this->request        = $request;
 	}
 
 	/**
@@ -72,7 +72,7 @@ class ERC721 extends \WNFTD\NFT_Contract {
 	public function get_balance_for_public_address( $public_address ) {
 		$json     = $this->get_balance_of_json_rpc( $public_address );
 		$json     = \wp_json_encode( $json );
-		$response = $this->request->post( \WNFTD\get_api_key(), array( 'body' => $json ) );
+		$response = $this->request->post( $this->api_url, array( 'body' => $json ) );
 
 		$balance = $this->get_balance_from_response( $response );
 		return $balance;

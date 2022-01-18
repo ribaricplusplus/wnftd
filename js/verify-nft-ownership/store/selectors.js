@@ -2,10 +2,6 @@ export function isUserLoggedIn( state ) {
 	return state.isUserLoggedIn ?? false;
 }
 
-export function getPublicAddress( state ) {
-	return state.publicAddress ?? null;
-}
-
 export function getNonce( state, nonce ) {
 	return state.nonces[ nonce ] ?? null;
 }

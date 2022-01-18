@@ -23,6 +23,7 @@ class NFT extends \WC_Data {
 		'fake_owner'       => '',
 		'image_id'         => 0,
 		'buy_url'          => '',
+		'network'          => 'polygon',
 	);
 
 	/*
@@ -94,6 +95,10 @@ class NFT extends \WC_Data {
 		return $this->get_prop( 'buy_url', $context );
 	}
 
+	public function get_network( $context = 'view' ) {
+		return $this->get_prop( 'network', $context );
+	}
+
 	/*
 	|--------------------------------------------------------------------------
 	| Setters
@@ -130,6 +135,10 @@ class NFT extends \WC_Data {
 
 	public function set_buy_url( $data ) {
 		return $this->set_prop( 'buy_url', $data );
+	}
+
+	public function set_network( $data ) {
+		return $this->set_prop( 'network', $data );
 	}
 
 	/*
