@@ -88,6 +88,7 @@ export async function getWeb3Signer() {
 				window.location.reload();
 			}
 		} catch ( e ) {
+			signer = null;
 			throw new errorFactory( 'chain_id_mismatch', {
 				productChainId,
 			} );
