@@ -4,7 +4,7 @@
  * Description: Makes it possible to download WooCommmerce products by owning a certain NFT.
  * Requires at least: 5.8
  * Requires PHP: 7.3
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: Ribarich
  * Author URI: https://ribarich.me/
  * Text Domain: wnftd
