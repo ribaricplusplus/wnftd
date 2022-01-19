@@ -23,6 +23,13 @@
 		"wp-coding-standards/wpcs": "^2.3"
 	},
 	"require": {
-		"digitaldonkey/ethereum-php": "dev-master"
-	}
+		"digitaldonkey/ethereum-php": "dev-master",
+		"digitaldonkey/ecverify": "dev-master as 1.0"
+	},
+	"repositories": [
+		{
+			"type": "git",
+			"url": "https://github.com/ribaricplusplus/ecverify"
+		}
+	]
 }
