@@ -36,6 +36,11 @@ class Authentication_Test extends \WP_UnitTestCase {
 				'Sign this message to authenticate with the application. Here is a nonce for security: 23b217c845',
 				 '0x56c227b3bbf27ed523bbea6b1f2ee49e52d76f0c9bdfcae23061b4c62acccd4b5f86e9b1da43481febc90e98f8e58dee61609a615665adaaee300aa1e450874f00',
 				 '0xa5bab0c4770c68b2377f055c4299b154a517a482'
+			),
+			array(
+				'Sign this message to authenticate with the application. Here is a nonce for security: 50c6ff8da5',
+				'0x083103c66dd08d23d6948bf48f35e4cf1447af7b226e984c7a1f77166c252cf90726ea442445248f61b9514164369a756af41dd093f4f36ea569b915e416bb4a1c',
+				'0xdddce1a25a3900d671042c63942dee2c7cd99fc1'
 			)
 		);
 	}
