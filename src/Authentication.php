@@ -21,7 +21,7 @@ class Authentication implements Interfaces\Initializable {
 		try {
 			$public_address = strtolower( $public_address );
 			$recovered      = EcRecover::personalEcRecover( $message, $signature );
-			if ( $recovered === $public_address ) {
+			if ( \WNFTD\public_addresses_equal( $public_address, $recovered ) ) {
 				return true;
 			}
 			return false;
