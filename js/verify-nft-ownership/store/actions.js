@@ -1,6 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
 
-import { errorFactory, getPublicAddress, getWeb3Signer } from '../util';
+import { errorFactory, getPublicAddress, signMessage } from '../util';
 
 export function setUserLoggedIn( loggedIn ) {
 	return {
@@ -111,10 +111,9 @@ export function addUserOwnedPublicAddress( publicAddress ) {
 export function requestPublicAddressVerification() {
 	return async ( { dispatch, select, resolveSelect } ) => {
 		const message = await select.getMessageForSigning();
-		const signer = await getWeb3Signer();
 
 		const account = await getPublicAddress();
-		const signature = await signer.signMessage( message );
+		const signature = await signMessage( message );
 
 		if ( ! signature ) {
 			throw new Error( 'Failed to get signature.' );
@@ -139,4 +138,11 @@ export function requestPublicAddressVerification() {
 
 		return account;
 	};
+}
+
+export function setSwitchingNetwork( isSwitching ) {
+	return {
+		type: 'SET_SWITCHING_NETWORK',
+		isSwitching
+	}
 }

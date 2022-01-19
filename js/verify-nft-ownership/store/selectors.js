@@ -17,3 +17,7 @@ export function getUserOwnedPublicAddresses( state ) {
 export function getMessageForSigning( state ) {
 	return state.messageForSigning;
 }
+
+export function isSwitchingNetwork( state ) {
+	return state.isSwitchingNetwork;
+}

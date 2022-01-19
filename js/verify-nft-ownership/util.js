@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { dispatch } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { STORE_NAME } from './store';
 
@@ -80,11 +80,13 @@ export async function getWeb3Signer() {
 				name: 'chain_id_mismatch',
 				message: getNetworkSwitchMessage( productChainId ),
 			} );
-			const ret = await window.ethereum.request( {
+
+			const results = await Promise.all( [ window.ethereum.request( {
 				method: 'wallet_switchEthereumChain',
 				params: [ { chainId: '0x' + productChainId.toString( 16 ) } ],
-			} );
-			if ( ret !== null ) {
+			} ), dispatch( STORE_NAME ).setSwitchingNetwork( true ) ] )
+
+			if ( results[0] !== null ) {
 				throw new Error();
 			} else {
 				window.location.reload();
@@ -98,6 +100,16 @@ export async function getWeb3Signer() {
 	}
 
 	return signer;
+}
+
+export async function signMessage( message ) {
+	if ( await select( STORE_NAME ).isSwitchingNetwork() ) {
+		throw new Error();
+	}
+
+	const _signer = await getWeb3Signer();
+
+	return _signer.signMessage( message );
 }
 
 export function getChainId() {

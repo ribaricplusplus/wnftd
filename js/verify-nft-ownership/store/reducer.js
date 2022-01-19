@@ -68,6 +68,14 @@ function messageForSigning( state = '', action ) {
 	return state;
 }
 
+function isSwitchingNetwork( state = false, action ) {
+	switch( action.type ) {
+		case 'SET_SWITCHING_NETWORK':
+			return action.isSwitching;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	isUserLoggedIn,
 	publicAddress,
@@ -75,4 +83,5 @@ export default combineReducers( {
 	messages,
 	userOwnedPublicAddresses,
 	messageForSigning,
+	isSwitchingNetwork
 } );
