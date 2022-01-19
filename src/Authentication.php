@@ -4,6 +4,8 @@ namespace WNFTD;
 
 defined( 'ABSPATH' ) || exit;
 
+use Elliptic\EC;
+use kornrunner\Keccak;
 use Ethereum\EcRecover;
 
 class Authentication implements Interfaces\Initializable {
@@ -20,7 +22,7 @@ class Authentication implements Interfaces\Initializable {
 	public function verify_public_address( $public_address, $message, $signature ) {
 		try {
 			$public_address = strtolower( $public_address );
-			$recovered      = EcRecover::personalEcRecover( $message, $signature );
+			$recovered = $this->_recover_public_address( $public_address, $message, $signature );
 			if ( \WNFTD\public_addresses_equal( $public_address, $recovered ) ) {
 				return true;
 			}
@@ -33,6 +35,36 @@ class Authentication implements Interfaces\Initializable {
 			return false;
 		}
 	}
+
+	/**
+	 * @throws \Exception
+	 * @param string $public_address
+	 * @param string $message
+	 * @param string $signature
+	 * @return string Whether the $signature for $message is by $public address.
+	 */
+	public function _recover_public_address( $public_address, $message, $signature ) {
+        $ec = new EC('secp256k1');
+        $sign   = ["r" => substr($signature, 2, 64), "s" => substr($signature, 66, 64)];
+        $message_hash =  '0x' . Keccak::hash(EcRecover::personalSignAddHeader($message), 256);
+
+        // Recovery parameter must be a number between 0 and 3. See https://github.com/indutny/elliptic/blob/43ac7f230069bd1575e1e4a58394a512303ba803/lib/elliptic/ec/index.js#L226
+        for( $recid = 0; $recid < 4; ++$recid ) {
+            try {
+                $pub_key = $ec->recoverPubKey($message_hash, $sign, $recid);
+                $recovered_address = "0x" . substr(Keccak::hash(substr(hex2bin($pub_key->encode("hex")), 1), 256), 24);
+				if ( ! \WNFTD\public_addresses_equal( $public_address, $recovered_address ) ) {
+					continue;
+				}
+                return $recovered_address;
+            } catch ( \Exception $e ) {
+                continue;
+            }
+        }
+
+        throw new \Exception( 'Recovery failed.' );
+	}
+
 
 	/**
 	 * @param string $public_address
