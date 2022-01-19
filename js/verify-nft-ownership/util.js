@@ -36,14 +36,16 @@ export function errorFactory( name, additionalData = {} ) {
 	return error;
 }
 
-export function getWeb3Provider() {
+export async function getWeb3Provider() {
 	if ( provider ) {
 		return provider;
 	}
 
-	if ( ! window.ethereum ) {
+	if ( ! hasMetaMask() ) {
 		throw new Error();
 	}
+
+	await window.ethereum.request( { method: 'eth_requestAccounts' } );
 
 	provider = new ethers.providers.Web3Provider( window.ethereum );
 
@@ -64,7 +66,7 @@ export async function getWeb3Signer() {
 	}
 
 	if ( ! provider ) {
-		getWeb3Provider();
+		await getWeb3Provider();
 	}
 
 	signer = await provider.getSigner();
