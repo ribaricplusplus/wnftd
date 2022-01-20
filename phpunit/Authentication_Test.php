@@ -40,8 +40,8 @@ class Authentication_Test extends \WP_UnitTestCase {
 
 		$sut->transfer_address_ownership( $old_owner_id, $new_owner_id, $public_address );
 
-		$old_owner_addresses = \wp_get_object_terms( $old_owner_id, 'wnftd_public_address' );
-		$new_owner_addresses = \wp_get_object_terms( $new_owner_id, 'wnftd_public_address' );
+		$old_owner_addresses = \wp_list_pluck( \wp_get_object_terms( $old_owner_id, 'wnftd_public_address' ), 'name') ;
+		$new_owner_addresses = \wp_list_pluck(\wp_get_object_terms( $new_owner_id, 'wnftd_public_address' ), 'name') ;
 
 		$this->assertNotContains( $public_address, $old_owner_addresses );
 		$this->assertContains( $public_address, $new_owner_addresses );

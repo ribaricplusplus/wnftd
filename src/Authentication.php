@@ -88,7 +88,7 @@ class Authentication implements Interfaces\Initializable {
 			return null;
 		}
 
-		return $ids[0];
+		return absint( $ids[0] );
 	}
 
 	/**
