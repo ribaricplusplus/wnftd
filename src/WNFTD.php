@@ -183,6 +183,7 @@ class WNFTD {
 	public function rest_api_init() {
 		$controllers = array(
 			'Authentication',
+			'Nonces',
 		);
 		foreach ( $controllers as $controller ) {
 			$class    = __NAMESPACE__ . '\\REST\\' . $controller;

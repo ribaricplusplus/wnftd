@@ -6,6 +6,10 @@ export function getNonce( state, nonce ) {
 	return state.nonces[ nonce ] ?? null;
 }
 
+export function getNonces( state ) {
+	return state.nonces;
+}
+
 export function getMessages( state ) {
 	return state.messages;
 }

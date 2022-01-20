@@ -100,4 +100,31 @@ class Factory {
 	public static function create_request() {
 		return new \WNFTD\Request();
 	}
+
+	public static function create_rest_error( $cause = null ) {
+		if ( empty( $cause ) ) {
+			return new \WP_Error(
+				'wnftd_rest_error',
+				'REST error.',
+				array( 'status' => 400 )
+			);
+		}
+
+		switch ( $cause ) {
+			case 'invalid_nonce':
+				return new \WP_Error(
+					'wnftd_rest_invalid_nonce',
+					'Invalid nonce.',
+					array( 'status' => 403 )
+				);
+			case 'server_error':
+				return new \WP_Error(
+					'wnftd_rest_server_error',
+					'An error occurred.',
+					array( 'status' => 500 )
+				);
+		}
+
+		throw new \Exception( 'Unknown REST error cause.' );
+	}
 }

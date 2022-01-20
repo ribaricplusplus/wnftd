@@ -88,6 +88,7 @@ export default function ActionButton( { status, setStatus } ) {
 }
 
 async function handleError( e, addMessage ) {
+	console.error( e );
 	if ( e.code === 'signature_verification' ) {
 		await addMessage( {
 			name: 'public_address_verification_failed',
@@ -108,7 +109,6 @@ async function handleError( e, addMessage ) {
 			),
 		} );
 	} else {
-		console.error( e );
 		await addMessage( {
 			name: 'error_occurred',
 			message: __( 'An error occurred.', 'wnftd' ),

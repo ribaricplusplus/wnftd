@@ -90,6 +90,12 @@ class Scripts_Loader implements Interfaces\Initializable {
 					'nonces'                   => array(
 						'auth'     => $auth_nonce,
 						'download' => \wp_create_nonce( 'wnftd_product_download' ),
+						'_wpnonce' => \wp_create_nonce( 'wp_rest' ),
+					),
+					'nonceActions'             => array(
+						'wnftd_auth'             => 'auth',
+						'wnftd_product_download' => 'download',
+						'wp_rest'                => '_wpnonce',
 					),
 					'userOwnedPublicAddresses' => $this->auth->get_public_addresses( \get_current_user_id() ),
 					'messageForSigning'        => \WNFTD\get_auth_message( $auth_nonce ),

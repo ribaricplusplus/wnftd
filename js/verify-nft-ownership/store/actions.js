@@ -129,14 +129,47 @@ export function requestPublicAddressVerification() {
 
 		try {
 			await apiFetch( { path: `/wnftd/v1/auth?${ params.toString() }` } );
+			await dispatch.refreshNonces();
 			await dispatch.addUserOwnedPublicAddress( account );
 		} catch ( e ) {
+			console.error( e );
 			const error = new Error( 'Signature verification failed.' );
 			error.code = 'signature_verification';
 			throw error;
 		}
 
 		return account;
+	};
+}
+
+export function refreshNonces() {
+	return async ( { select, dispatch } ) => {
+		const nonces = await select.getNonces();
+		// Maps action to key name that's used in nonces.
+		const nonceActions = window?.wnftdData?.nonceActions;
+		const params = new URLSearchParams( {
+			actions: Object.keys( nonceActions ),
+		} );
+		const response = await apiFetch( {
+			path: `/wnftd/v1/nonces?${ params.toString() }`,
+		} );
+
+		// A bit of technical debt here. Looks complicated but does a simple
+		// thing. Basically, response from REST API is in the format actionName
+		// => nonce, whereas client side we're using randomUselessName => nonce.
+		// So it is necessary to map actionName to randomUselessName. So that
+		// new nonces are randomUselessName => nonce, as the store expects.
+		const newNonces = Object.entries( response ).reduce(
+			( acc, [ action, nonce ] ) => {
+				return {
+					...acc,
+					[ nonceActions[ action ] ]: nonce,
+				};
+			},
+			{}
+		);
+
+		await dispatch.setNonces( newNonces );
 	};
 }
 
