@@ -81,12 +81,17 @@ export async function getWeb3Signer() {
 				message: getNetworkSwitchMessage( productChainId ),
 			} );
 
-			const results = await Promise.all( [ window.ethereum.request( {
-				method: 'wallet_switchEthereumChain',
-				params: [ { chainId: '0x' + productChainId.toString( 16 ) } ],
-			} ), dispatch( STORE_NAME ).setSwitchingNetwork( true ) ] )
+			const results = await Promise.all( [
+				window.ethereum.request( {
+					method: 'wallet_switchEthereumChain',
+					params: [
+						{ chainId: '0x' + productChainId.toString( 16 ) },
+					],
+				} ),
+				dispatch( STORE_NAME ).setSwitchingNetwork( true ),
+			] );
 
-			if ( results[0] !== null ) {
+			if ( results[ 0 ] !== null ) {
 				throw new Error();
 			} else {
 				window.location.reload();

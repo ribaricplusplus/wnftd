@@ -143,6 +143,6 @@ export function requestPublicAddressVerification() {
 export function setSwitchingNetwork( isSwitching ) {
 	return {
 		type: 'SET_SWITCHING_NETWORK',
-		isSwitching
-	}
+		isSwitching,
+	};
 }
