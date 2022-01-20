@@ -30,6 +30,12 @@ function _manually_load_plugin() {
 	require $plugins_dir . '/woocommerce/woocommerce.php';
 
 	// Load WNFTD
+	tests_add_filter(
+		'wnftd_api_key_fallback',
+		function() {
+			return 'something_non_empty';
+		}
+	);
 	require dirname( __DIR__ ) . '/woocommerce-nft-downloads.php';
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );

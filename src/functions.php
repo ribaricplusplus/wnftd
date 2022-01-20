@@ -80,7 +80,18 @@ function get_api_key( $network = 'ethereum' ) {
 		}
 	}
 
+	$api_key = apply_filters( 'wnftd_api_key_fallback', null, $network );
+
+	if ( $api_key ) {
+		return $api_key;
+	}
+
 	throw new \Exception( 'RPC URL not found.' );
+
+}
+
+function is_testing() {
+	return defined( 'WNFTD_TEST' ) && \WNFTD_TEST;
 }
 
 function clean_unslash( $var ) {

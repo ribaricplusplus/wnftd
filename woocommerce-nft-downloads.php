@@ -20,7 +20,7 @@ try {
 	\WNFTD\instance();
 } catch ( \WNFTD\Initialization_Exception $e ) {
 
-	if ( defined( 'WNFTD_TEST' ) && WNFTD_TEST ) {
+	if ( \WNFTD\is_testing() ) {
 		throw $e;
 	}
 }

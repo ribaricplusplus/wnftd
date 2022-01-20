@@ -50,10 +50,8 @@ class WNFTD {
 		$this->product_controller = new Product_Controller( $this->auth );
 		$this->product_controller->init();
 
-		try {
-			$this->ethereum = Factory::create_ethereum();
-		} catch ( \Exception $e ) {
-			$this->fail_initialization( __( 'Failed to initialize Ethereum RPC', 'wnftd' ), 'fail_ethereum' );
+		if ( ! $this->has_ethereum_api_url() ) {
+			$this->fail_initialization( __( 'Missing URL for Ethereum API. Check that you have set Polygon or Ethereum RPC API URLs in WooCommerce > Settings > Products > Downloadable Products.', 'wnftd' ) );
 		}
 
 		$this->scripts_loader = new Scripts_Loader( $this->product_controller, $this->auth );
@@ -67,6 +65,28 @@ class WNFTD {
 		\add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
 		\add_action( 'init', array( $this, 'register_post_types_and_taxonomies' ) );
 	}
+
+
+	public function has_ethereum_api_url() {
+		try {
+			$has_url = false;
+			foreach ( array( 'ethereum', 'polygon' ) as $network ) {
+				try {
+					$url = \WNFTD\get_api_key( $network );
+					if ( $url ) {
+						$has_url = true;
+						break;
+					}
+				} catch ( \Exception $e ) {
+					continue;
+				}
+			}
+			return $has_url;
+		} catch ( \Exception $e ) {
+			return false;
+		}
+	}
+
 
 	public function init_admin() {
 		$this->admin = new Admin(
