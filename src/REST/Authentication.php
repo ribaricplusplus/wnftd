@@ -52,7 +52,7 @@ class Authentication extends \WP_REST_Controller {
 
 			$user = \WNFTD\auth()->get_user_by_public_address( $request['public_address'] );
 			if ( ! empty( $user ) ) {
-				$user = \get_user( $user );
+				$user = \get_user_by( 'id', $user );
 			}
 
 			if ( is_user_logged_in() ) {
