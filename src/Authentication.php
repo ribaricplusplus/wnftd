@@ -71,7 +71,7 @@ class Authentication implements Interfaces\Initializable {
 
 	/**
 	 * @param string $public_address
-	 * @return int|null
+	 * @return \WP_User|null
 	 */
 	public function get_user_by_public_address( $public_address ) {
 		$public_address = strtolower( $public_address );
@@ -88,7 +88,7 @@ class Authentication implements Interfaces\Initializable {
 			return null;
 		}
 
-		return absint( $ids[0] );
+		return \get_user_by( 'id', absint( $ids[0] ) );
 	}
 
 	/**
