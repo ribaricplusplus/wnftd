@@ -1,5 +1,7 @@
 # WooCommerce NFT Downloads
 
+Makes it possible to give customers access to product downloads by checking that customers own a certain NFT. Limited documentation available in docs/.
+
 ## Setup
 
 Run the following commands
@@ -13,6 +15,12 @@ Start the server
 
 ```
 npm run start
+```
+
+Generate zip
+
+```
+./scripts/helper.js zip
 ```
 
 Note that this repository uses a fork of `@wordpress/env` so that the GMP module can be enabled.
