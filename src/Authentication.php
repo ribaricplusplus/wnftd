@@ -162,7 +162,7 @@ class Authentication implements Interfaces\Initializable {
 		try {
 			$public_address = strtolower( $public_address );
 
-			$uid = \wp_generate_uuid4();
+			$uid   = \wp_generate_uuid4();
 			$email = sprintf( '%s@example.com', $uid );
 
 			if ( $this->public_address_exists( $public_address ) ) {

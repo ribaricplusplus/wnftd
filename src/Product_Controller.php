@@ -31,7 +31,7 @@ class Product_Controller implements Initializable {
 	public function __construct( $auth, $factory = false ) {
 		$this->auth = $auth;
 		if ( empty( $factory ) ) {
-			$this->factory = new Factory(); // Not ideal
+			$this->factory = new Factory(); // Factory should never have been static in the first place.
 		} else {
 			$this->factory = $factory;
 		}
@@ -68,12 +68,12 @@ class Product_Controller implements Initializable {
 	 * @return bool Whether user has access.
 	 */
 	public function grant_access_by_nft( $user_id, $product ) {
-		if ( \wc_customer_bought_product( '', $user_id, $product->get_id() ) ) {
-			return true;
-		}
-
 		if ( ! $product->is_downloadable() ) {
 			throw new \InvalidArgumentException();
+		}
+
+		if ( $this->user_can_download_product( $user_id, $product ) ) {
+			return true;
 		}
 
 		if ( ! $this->is_nft_restricted( $product ) ) {
@@ -104,6 +104,22 @@ class Product_Controller implements Initializable {
 
 			if ( $has_access ) {
 				$this->give_product_to_user( $product, $user_id );
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param int $user_id
+	 * @param \WC_Product $product
+	 * @return bool
+	 */
+	public function user_can_download_product( $user_id, $product ) {
+		$results = \wc_get_customer_download_permissions( $user_id );
+		foreach ( $results as $result ) {
+			if ( (int) $result->product_id === (int) $product->get_id() ) {
 				return true;
 			}
 		}

@@ -100,7 +100,7 @@ class Authentication_Test extends \WP_UnitTestCase {
 	public function test_new_user_creation_cleanup() {
 		mock_function(
 			'wc_create_new_customer',
-			function( $email, $username = '', $password  = '' ) {
+			function( $email, $username = '', $password = '' ) {
 				throw new \Exception();
 			}
 		);
