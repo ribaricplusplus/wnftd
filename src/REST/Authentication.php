@@ -100,7 +100,11 @@ class Authentication extends \WP_REST_Controller {
 							)
 						);
 					} catch ( \Exception $e ) {
-						return \WP_Error(
+						trigger_error(
+							$e->getMessage(),
+							\E_USER_NOTICE
+						);
+						return new \WP_Error(
 							'wnftd_rest_error',
 							__( 'Failed to create user.', 'wnftd' ),
 							array( 'status' => 500 )

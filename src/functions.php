@@ -20,7 +20,7 @@ function instance() {
  */
 function get_auth_message( $nonce ) {
 	return sprintf(
-		__( 'Sign this message to authenticate with the application. Here is a nonce for security: %s', 'wnftd' ),
+		__( 'Sign this message to authenticate with the application. Nonce: %s', 'wnftd' ),
 		$nonce
 	);
 }
@@ -135,4 +135,50 @@ function get_valid_networks() {
 
 function is_valid_network( $network ) {
 	return in_array( $network, array_keys( get_valid_networks() ) );
+}
+
+function is_removeable( $thing ) {
+	return ! empty( $thing ) && ! \is_wp_error( $thing );
+}
+
+function clean_up_term( $term, $taxonomy ) {
+	if ( ! is_removeable( $term ) ) {
+		return;
+	}
+
+	if ( is_array( $term ) ) {
+		return \wp_delete_term( $term['term_id'], $taxonomy );
+	} elseif ( is_numeric( $term ) ) {
+		return \wp_delete_term( $term, $taxonomy );
+	} elseif ( is_a( $term, 'WP_Term' ) ) {
+		return \wp_delete_term( $term->term_id, $taxonomy );
+	}
+
+	throw new \Exception();
+}
+
+function clean_up_user( $user ) {
+	if ( ! is_removeable( $user ) ) {
+		return;
+	}
+
+	if ( is_a( $user, 'WP_User' ) ) {
+		return \wp_delete_user( $user->ID );
+	} elseif ( is_numeric( $user ) ) {
+		return \wp_delete_user( $user );
+	}
+
+	throw new \Exception();
+}
+
+/**
+ * Proxy call function so that the implementation can be changed for testing.
+ *
+ * @param string $function
+ * @param array $params
+ * @return mixed
+ */
+function call( $function, $params = array() ) {
+	$function = apply_filters( "wnftd_proxy_$function", $function, $params );
+	return call_user_func_array( $function, $params );
 }

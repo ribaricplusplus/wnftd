@@ -16,6 +16,9 @@ $_tests_dir = dirname( __DIR__ ) . '/wp-phpunit';
 // Give access to tests_add_filter() function.
 require_once $_tests_dir . '/includes/functions.php';
 
+// WNFTD testing utilities
+require_once 'functions.php';
+
 // Always load PayPal Standard for unit tests.
 tests_add_filter( 'woocommerce_should_load_paypal_standard', '__return_true' );
 

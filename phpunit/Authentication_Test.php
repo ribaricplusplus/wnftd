@@ -2,6 +2,8 @@
 
 namespace WNFTD\Test;
 
+use WNFTD\Test\mock_function;
+
 class Authentication_Test extends \WP_UnitTestCase {
 	// Random public address in the correct format
 	const public_address = '0xb794f5ea0ba39494ce839613fffba74279579268';
@@ -15,6 +17,11 @@ class Authentication_Test extends \WP_UnitTestCase {
 		$this->assertEquals( true, $user->exists() );
 		$public_addresses = $sut->get_public_addresses( $user->ID );
 		$this->assertContains( $pa, $public_addresses );
+	}
+
+	public function set_up() {
+		parent::set_up();
+		$this->sut = new \WNFTD\Authentication();
 	}
 
 	/**
@@ -71,12 +78,12 @@ class Authentication_Test extends \WP_UnitTestCase {
 		$message           = 'This is my message';
 		$invalid_signature = '0xdaaaaaaaaaaeb3f154a76e2be0e28caff56943959445e0d23e129550c1873c8e65dd73047618f920c8857fa0fd0dfa49bb2306b882321399ac9a18646c69f70d1b';
 		$public_address    = '0xe0e0abad1eb467bd8c74357c8a29645deed446af';
-		$sut               = new \WNFTD\Authentication();
+		$sut               = &$this->sut;
 		$this->assertFalse( $sut->verify_public_address( $public_address, $message, $invalid_signature ) );
 	}
 
 	public function test_get_user_by_public_address() {
-		$sut     = new \WNFTD\Authentication();
+		$sut     = &$this->sut;
 		$user_id = $sut->create_new_user( self::public_address );
 		$this->assertNotEmpty( $user_id );
 		$found_user_id = ( $sut->get_user_by_public_address( self::public_address ) )->ID;
@@ -84,10 +91,68 @@ class Authentication_Test extends \WP_UnitTestCase {
 	}
 
 	public function test_assign_public_address_to_user() {
-		$sut  = new \WNFTD\Authentication();
+		$sut  = &$this->sut;
 		$user = $this->factory->user->create();
 		$sut->assign_public_address_to_user( '0x1234', $user );
 		$this->assertNotEmpty( \wp_get_object_terms( $user, 'wnftd_public_address' ) );
+	}
+
+	public function test_new_user_creation_cleanup() {
+		mock_function(
+			'wc_create_new_customer',
+			function( $email, $username = '', $password  = '' ) {
+				throw new \Exception();
+			}
+		);
+
+		$initial_count = \wp_count_terms(
+			array(
+				'taxonomy' => 'wnftd_public_address',
+				'number'   => 0,
+			)
+		);
+		try {
+			$this->sut->create_new_user( self::public_address );
+		} catch ( \Exception $e ) {
+			$has_thrown = true;
+		}
+
+		$this->assertNotEmpty( $has_thrown );
+		$final_count = \wp_count_terms(
+			array(
+				'taxonomy' => 'wnftd_public_address',
+				'number'   => 0,
+			)
+		);
+
+		// Initial count can be greater if user creation deletes an existing public address.
+		$this->assertGreaterThanOrEqual( (int) $final_count, (int) $initial_count );
+	}
+
+	public function test_unassign_public_address_from_all_users() {
+		$sut   = new \WNFTD\Authentication();
+		$users = $this->factory->user->create_many( 3 );
+		foreach ( $users as $user ) {
+			$sut->assign_public_address_to_user( self::public_address, $user );
+			$this->assertContains( self::public_address, $sut->get_public_addresses( $user ) );
+		}
+
+		$sut->unassign_public_address_from_all_users( self::public_address );
+
+		foreach ( $users as $user ) {
+			$this->assertNotContains( self::public_address, $sut->get_public_addresses( $user ) );
+		}
+	}
+
+	public function test_uppercase_public_address_cannot_be_saved() {
+		$public_address = '0xABCD';
+
+		$this->assertEmpty( \term_exists( $public_address, 'wnftd_public_address' ) );
+
+		$data = \wp_insert_term( $public_address, 'wnftd_public_address' );
+		$term = \get_term( $data['term_id'] );
+
+		$this->assertEmpty( preg_match( '/[A-Z]/', $term->name ) );
 	}
 
 }

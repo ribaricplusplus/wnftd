@@ -8,6 +8,10 @@ use Elliptic\EC;
 use kornrunner\Keccak;
 use Ethereum\EcRecover;
 
+/**
+ * TODO: All of the public address functionality here should be extracted into
+ * a separate class that wraps a single public address.
+ */
 class Authentication implements Interfaces\Initializable {
 	public function init() {
 		\add_action( 'saved_wnftd_public_address', array( $this, 'force_lowercase_term_name' ) );
@@ -155,35 +159,58 @@ class Authentication implements Interfaces\Initializable {
 	 * @return int User ID.
 	 */
 	public function create_new_user( $public_address ) {
+		try {
+			$public_address = strtolower( $public_address );
+
+			$uid = \wp_generate_uuid4();
+			$email = sprintf( '%s@example.com', $uid );
+
+			if ( $this->public_address_exists( $public_address ) ) {
+				$this->unassign_public_address_from_all_users( $public_address );
+				$term    = $this->get_public_address_term( $public_address );
+				$term_id = $term->term_id;
+			} else {
+				$term = \wp_insert_term( $public_address, 'wnftd_public_address' );
+				if ( is_wp_error( $term ) ) {
+					throw new \Exception( 'Failed to save public address.' );
+				}
+				$term_id = $term['term_id'];
+			}
+
+			$user_id = \WNFTD\call( 'wc_create_new_customer', array( $email, $uid, \wp_generate_password() ) );
+
+			if ( is_wp_error( $user_id ) ) {
+				throw new \Exception( 'Failed to create user.' );
+			}
+
+			$result = \wp_set_object_terms( $user_id, $term_id, 'wnftd_public_address' );
+
+			if ( is_wp_error( $result ) ) {
+				throw new \Exception( 'Failed to create user.' );
+			}
+
+			return $user_id;
+		} catch ( \Exception $e ) {
+			\WNFTD\clean_up_term( $term, 'wnftd_public_address' );
+			\WNFTD\clean_up_user( $user_id );
+			throw $e;
+		}
+	}
+
+	public function unassign_public_address_from_all_users( $public_address ) {
 		$public_address = strtolower( $public_address );
 
-		$email = sprintf( '%s@example.com', \wp_generate_uuid4() );
-		if ( $this->public_address_exists( $public_address ) ) {
-			throw new \Exception( 'Cannot create a new user for a public address that already exists.' );
+		$term = $this->get_public_address_term( $public_address );
+
+		if ( empty( $term ) ) {
+			return;
 		}
 
-		$term = \wp_insert_term( $public_address, 'wnftd_public_address' );
+		$users = \get_objects_in_term( $term->term_id, 'wnftd_public_address' );
 
-		if ( is_wp_error( $term ) ) {
-			throw new \Exception( 'Failed to create user' );
+		foreach ( $users as $user ) {
+			$this->unassign_public_address_from_user( $public_address, $user );
 		}
-
-		$user_id = \wc_create_new_customer( $email );
-
-		if ( is_wp_error( $user_id ) ) {
-			\wp_delete_term( $term['term_id'] );
-			throw new \Exception( 'Failed to create user.' );
-		}
-
-		$result = \wp_set_object_terms( $user_id, $term['term_id'], 'wnftd_public_address' );
-
-		if ( is_wp_error( $result ) ) {
-			\wp_delete_user( $user_id );
-			\wp_delete_term( $term['term_id'] );
-			throw new \Exception( 'Failed to create user.' );
-		}
-
-		return $user_id;
 	}
 
 	public function delete_user( $user_id ) {
