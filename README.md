@@ -2,7 +2,7 @@
 
 ![hero](./docs/images/hero.png)
 
-Makes it possible to give customers access to product downloads by checking that customers own a certain NFT. Limited documentation available in docs/.
+WordPress plugin that makes it possible to give customers access to product downloads by checking that customers own a certain NFT. Limited documentation available in docs/.
 
 ## Setup
 
