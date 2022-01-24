@@ -49,8 +49,8 @@ class Products extends \WP_REST_Controller {
 
 			if ( ! $this->product_controller->grant_access_by_nft( $user->ID, $product ) ) {
 				return new \WP_Error(
-					'wnftd_forbidden',
-					'Permission denied',
+					'wnftd_nft_verification_failed',
+					'NFT ownership not verified',
 					array( 'status' => 401 )
 				);
 			}
@@ -58,9 +58,9 @@ class Products extends \WP_REST_Controller {
 			return true;
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
-				'wnftd_forbidden',
-				'Permission denied',
-				array( 'status' => 401 )
+				'wnftd_permission_exception',
+				'An exception occurred in permission verification.',
+				array( 'status' => 500 )
 			);
 		}
 	}
