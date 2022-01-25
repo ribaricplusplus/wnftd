@@ -38,27 +38,22 @@ class Product_Controller implements Initializable {
 	}
 
 	/**
+	 * @throws \Exception
 	 * @param \WC_Product $product
 	 * @param int $user
 	 */
 	public function give_product_to_user( $product, $user ) {
-		$order = \wc_create_order(
-			array(
-				'customer_id' => $user,
-			)
-		);
+		$order = new \WC_Order( 0 );
 
 		if ( \is_wp_error( $order ) ) {
 			throw new \Exception( $order->get_error_message() );
 		}
 
+		$order->set_customer_id( $user );
 		$order->add_product( $product );
-		$id    = $order->save();
-		$order = \wc_create_order(
-			array(
-				'order_id' => $id,
-			)
-		);
+		$id = $order->save();
+
+		$order = new \WC_Order( $id );
 		$order->set_status( 'completed' );
 		$order->save();
 	}
