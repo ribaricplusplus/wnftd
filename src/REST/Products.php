@@ -57,6 +57,10 @@ class Products extends \WP_REST_Controller {
 
 			return true;
 		} catch ( \Exception $e ) {
+			\trigger_error(
+				$e->getMessage(),
+				\E_USER_NOTICE
+			);
 			return new \WP_Error(
 				'wnftd_permission_exception',
 				'An exception occurred in permission verification.',

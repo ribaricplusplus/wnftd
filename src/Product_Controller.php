@@ -47,6 +47,11 @@ class Product_Controller implements Initializable {
 				'customer_id' => $user,
 			)
 		);
+
+		if ( \is_wp_error( $order ) ) {
+			throw new \Exception( $order->get_error_message() );
+		}
+
 		$order->add_product( $product );
 		$id    = $order->save();
 		$order = \wc_create_order(
