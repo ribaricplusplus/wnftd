@@ -26,7 +26,6 @@ test/native/junit.xml
 
 # Local overrides
 .wp-env.override.json
-phpcs.xml
 phpunit-watcher.yml
 .phpunit.result.cache
 .vscode/
