@@ -2,14 +2,21 @@
 
 ![hero](./docs/images/hero.png)
 
-WordPress plugin that makes it possible to give customers access to product downloads by checking that customers own a certain NFT. Limited documentation available in docs/.
+WordPress plugin that makes it possible to give customers access to product downloads by checking that customers own a certain NFT. Limited user documentation available in docs/.
 
-## Setup
+## Quick setup for testing and development
 
-Run the following commands
+This is a description for how to setup a local server and other tools needed to try out or develop this plugin.
+
+Requirements
+
+- Docker and Docker Compose
+- Node.js v16 (if you have `nvm`, run `nvm use`)
+- Composer
+
+After cloning the repository, run the following command to install npm and composer dependencies
 
 ```
-nvm use
 node ./scripts/setup.js
 ```
 
@@ -19,20 +26,29 @@ Start the server
 npm run start
 ```
 
+You should be able to access the site on `localhost:8888` and the plugin will be installed. See user documentation in `docs/` for usage instructions.
+
+## Automated testing
+
+- `phpunit/` - Unit tests
+- `specs/` - E2E tests
+
+Commands for running tests:
+
+- `npm run test:php` PHP unit tests
+- `npm run test:e2e` E2E tests
+- `npm run test:php:api` PHP unit tests that do remote API requests instead of using stubs. Listing an Ethereum node URL is required. See [Remote API testing](#remote-api-testing).
+
+### Remote API testing
+
+In order for Remote API tests to work, you need to be able to communicate to an Ethereum node and have its URL. You could use a service like [Alchemy](https://www.alchemy.com/) to set this up.
+
+Then, rename `secrets.php.example` to `secrets.php` and fill in the `eth_api_url` value. Now it should be possible to run remote API tests.
+
+## Other commands
+
 Generate zip
 
 ```
 ./scripts/helper.js zip
 ```
-
-Note that this repository uses a fork of `@wordpress/env` so that the GMP module can be enabled.
-
-## Testing
-
-PHPUnit tests do not use the [wp-phpunit](https://github.com/wp-phpunit/wp-phpunit/tree/master) package. Instead, the testing framework is copied from WordPress directly into `wp-phpunit` directory. This will need manual updating.
-
-## Tests
-
-- `npm run test:php` PHP unit tests
-- `npm run test:php:api` PHP unit tests that do remote API requests instead of using stubs
-- `npm run test:e2e` E2E tests
