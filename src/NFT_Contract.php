@@ -69,6 +69,7 @@ abstract class NFT_Contract {
 			throw new \InvalidArgumentException();
 		}
 
+		// TODO: This is not a proper call to json_decode.
 		$json = \json_decode( $response['body'], true, \JSON_BIGINT_AS_STRING );
 
 		if ( empty( $json ) || empty( $json['result'] ) ) {
