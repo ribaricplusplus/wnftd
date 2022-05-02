@@ -47,7 +47,13 @@ Then, rename `secrets.php.example` to `secrets.php` and fill in the `eth_api_url
 
 ## Other commands
 
-Generate zip
+Make sure you install dependencies before running any of these commands:
+
+```
+node ./scripts/setup.js
+```
+
+### Generate zip
 
 ```
 ./scripts/helper.js zip
